@@ -522,7 +522,7 @@ spring.jpa.hibernate.ddl-auto=create
   - ``` server.port=8081 ``` : permet de rédéfinir le port de notre server
   - ```spring.jpa.hibernate.ddl-auto=create``` : permet de définir le comportement de notre application. Ici ```create``` indique à JPA que la base de données sera reconstruite à chaque démarrage de l'application (perte de données à chaque redémarrage). ```validate``` permet d'utilisée une base de données déjà créée.
 
-- Usage d'une base de données extérieurs
+- Usage d'une base de données extérieure
   - Dans le cas ou vous souhaitez utiliser une base de données extérieur (e.g Postgresql) vous devez
     - ajouter la dépendance du connecteur JDBC au pom.xml et commenter les connecteurs non utilisés.
 
