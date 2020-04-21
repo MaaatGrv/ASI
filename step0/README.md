@@ -9,7 +9,7 @@ Springboot est un framework qui permet la création rapide d'applications notamm
 - File -> New -> Maven Project
 - Sélectionner ```create a simple project (skip artefact selection) ```
   
-<img alt="img New Maven Project" src="./images/../../images/newMavenProject1.jpg" width="300">
+<img alt="img New Maven Project" src="./images/newMavenProject1.jpg" width="300">
 
 - Cliquer sur ```Next```
 - Définir les propriétés de votre projet Maven:
@@ -17,12 +17,12 @@ Springboot est un framework qui permet la création rapide d'applications notamm
   - ```ArtefactId```: SPWebApp
   - ```Packaging```: jar
 
-<img alt="img New Maven Project 2" src="./images/../../images/newMavenProject2.jpg" width="300">
+<img alt="img New Maven Project 2" src="./images/newMavenProject2.jpg" width="300">
 
 - Cliquer sur finish
 - Le projet avec l'aborescence suivant à été créé 
 
-<img alt="img  Maven Project Structure" src="./images/../../images/MavenProjectStructure.jpg" width="300">
+<img alt="img  Maven Project Structure" src="./images/MavenProjectStructure.jpg" width="300">
 
 - Explications:
   - les projets Mavens possèdent une structure par défaut permettant de déterminer ou se trouve les fichiers à compiler , les ressources complémentaire, les fichiers de tests...
@@ -176,7 +176,7 @@ Springboot est un framework qui permet la création rapide d'applications notamm
 - Une fois le fichier modifier nous allons indiquer à Eclipse que le fichier de configuration Maven à changer et que ces modifications doivent être prises en compte.
   - clic droit sur le projet -> ```Maven``` -> ```Update Projet```
 
-<img alt="img  Maven Update Project " src="./images/../../images/MavenUpdateProject.jpg" width="500">
+<img alt="img  Maven Update Project " src="./images/MavenUpdateProject.jpg" width="500">
 
 - Votre projet est maintenant prêt pour utiliser Springboot
 
