@@ -20,17 +20,17 @@ Springboot est un framework qui permet la création rapide d'applications notamm
 <img alt="img New Maven Project 2" src="./images/newMavenProject2.jpg" width="300">
 
 - Cliquer sur finish
-- Le projet avec l'aborescence suivant à été créé 
+- Le projet avec l'aborescence suivant a été créé 
 
 <img alt="img  Maven Project Structure" src="./images/MavenProjectStructure.jpg" width="300">
 
 - Explications:
-  - les projets Mavens possèdent une structure par défaut permettant de déterminer ou se trouve les fichiers à compiler , les ressources complémentaire, les fichiers de tests...
+  - les projets Mavens possèdent une structure par défaut permettant de déterminer ou se trouve les fichiers à compiler , les ressources complémentaires, les fichiers de tests...
   - ```src/main/java``` : contiendra les fichiers .java de votre application organisés en package
-  - ```src/main/resources``` : contiendra toutes les ressources complémentaires à votre projet(e.g fichiers de configuration..)
+  - ```src/main/resources``` : contiendra toutes les ressources complémentaires à votre projet (e.g fichiers de configuration..)
   - ```test/main/java``` : contiendra tous les fichiers .java pour tester votre application
   - ```test/main/resources``` : contiendra toutes les ressources complémentaires pour tester votre projet
-  - ```pom.xml``` : est le fichier de description Maven qui contient l'ensemble des indications sur votre application, compilation, cycle de vie dépendances. C'est le fichier central d'une application gérée par Maven
+  - ```pom.xml``` : est le fichier de description Maven qui contient l'ensemble des indications sur votre application, compilation, cycle de vie, dépendances... C'est le fichier central d'une application gérée par Maven.
 
     ```xml
     <project 
@@ -127,7 +127,7 @@ Springboot est un framework qui permet la création rapide d'applications notamm
 	</parent>
     ...
     ```
-    - Notre projet va hériter des propriétés d'un autre projet. Nous allons construire ainsi notre projet Springboot à partir d'un modèle d'application. La balise ```<parent>``` permet ainsi d'indiquer un projet Maven parent duquel nous allons hériter toutes les propriétés et dépendances.
+    - Notre projet va hériter des propriétés d'un autre projet. Nous allons construire ainsi notre projet Springboot à partir d'un modèle d'application. La balise ```<parent>``` permet d'indiquer un projet Maven parent duquel nous allons hériter toutes les propriétés et dépendances.
 
     ```xml
     ...	
@@ -136,7 +136,7 @@ Springboot est un framework qui permet la création rapide d'applications notamm
     </properties>
     ...
     ```
-    - La balise ```<properties>``` permet d'indiquer des propriétés supplémentaires à notre projet. Ici nous souhaitons que notre application soit compilé à l'aide de java 1.8
+    - La balise ```<properties>``` permet d'indiquer des propriétés supplémentaires à notre projet. Ici nous souhaitons que notre application soit compilée à l'aide de java 1.8
 
     ```xml
     ...	
@@ -151,14 +151,14 @@ Springboot est un framework qui permet la création rapide d'applications notamm
 	</dependencies>
         ...
     ```
-    - Les balises ```<dependencies>```  et ```<dependency>``` permettent de définir les librairies à ajouter à notre projet en dépendances. Toutes ces librairies sont des projets maven qui vont être téléchargées en local sur notre machine depuis des repo. extérieur (e.g Maven Repository https://mvnrepository.com/repos/central). Ces libraires (e.g *.jar) sont stockés en général dans un répertoire ```.m2``` à la racine du dossier personnel de l'utilisateur.
+    - Les balises ```<dependencies>```  et ```<dependency>``` permettent de définir les librairies à ajouter à notre projet en dépendances. Toutes ces librairies sont des projets Maven qui vont être téléchargées en local sur notre machine depuis des repo. extérieurs (e.g Maven Repository https://mvnrepository.com/repos/central). Ces libraires (e.g *.jar) sont stockées en général dans un répertoire ```.m2``` à la racine du dossier personnel de l'utilisateur.
     - Il est possible de préciser les versions des libraires que l'on souhaite utiliser en utilisant la balise ```<version>```à l'intérieur de ```<dependency>```.
-    - Ici on ajoute l'ensemble des dépendances que nous allons utilisées par la suite:
-      - ```spring-boot-starter-web```: ensemble d'outil pour la création d'applications Web (Restful, Spring MVC,...)
+    - Ici on ajoute l'ensemble des dépendances que nous allons utiliser par la suite:
+      - ```spring-boot-starter-web```: Ensemble d'outils pour la création d'applications Web (Restful, Spring MVC,...)
       - ```spring-boot-starter-data-jpa``` : Utilitaire permettant de mapper les classes java en éléments d'une base de données et de gérer la persistance avec la base de données (Spring Data JPA with Hibernate)
       - ```h2``` : Connecteur vers une base de données (ici H2 est une base de données embarquées https://www.h2database.com/html/main.html)
-      - ```spring-boot-starter-tomcat``` : serveuc tomcat embarqué qui chargera notre application Web.
-      - ```spring-boot-starter-test``` : ensemble d'utilitaires pour tester notre application Web (e.g JUnit, Hamcrest and Mockito )
+      - ```spring-boot-starter-tomcat``` : Serveur tomcat embarqué qui chargera notre application Web.
+      - ```spring-boot-starter-test``` : Ensemble d'utilitaires pour tester notre application Web (e.g JUnit, Hamcrest and Mockito )
     ```xml
     ...	
     <build>
@@ -171,9 +171,9 @@ Springboot est un framework qui permet la création rapide d'applications notamm
 	</build>
     ...	
     ```
-    - la balise ```build``` contient l'ensemble des éléments permettant de gérer le cycle de vie de notre application.
+    - La balise ```build``` contient l'ensemble des éléments permettant de gérer le cycle de vie de notre application.
     - Ici le plugin ```spring-boot-maven-plugin``` va permettre de compiler et packager notre application suivant les règles indiquées dans ce plugin (https://docs.spring.io/spring-boot/docs/current/maven-plugin/usage.html)
-- Une fois le fichier modifier nous allons indiquer à Eclipse que le fichier de configuration Maven à changer et que ces modifications doivent être prises en compte.
+- Une fois le fichier modifié nous allons indiquer à Eclipse que le fichier de configuration Maven a changé et que ces modifications doivent être prises en compte.
   - clic droit sur le projet -> ```Maven``` -> ```Update Projet```
 
 <img alt="img  Maven Update Project " src="./images/MavenUpdateProject.jpg" width="500">
@@ -182,7 +182,7 @@ Springboot est un framework qui permet la création rapide d'applications notamm
 
 ### 2.3 Création d'un application vide Springboot
 - Dans ```src/main/java``` ajouter le package ```com.sp```
-- Dans les packages ```com.sp``` ajouter ```SpAppHero.java``` comme suit:
+- Dans les packages ```com.sp```, ajouter ```SpAppHero.java``` comme suit:
 
 ```java
 package com.sp;
@@ -218,7 +218,7 @@ public class SpAppHero {
     - Permet de lancer l'application Springboot (https://docs.spring.io/spring-boot/docs/current/api/org/springframework/boot/SpringApplication.html)
 
 - Lancer votre application Springboot clic droit sur le fichier ```SpAppHero.java``` -> ```Run As``` -> ```Java Application```
-- Votre application Springboot démarre. Le résultat suivant devrait apparaitre dans la console de votre application:
+- Votre application Springboot démarre. Le résultat suivant devrait apparaître dans la console de votre application:
 ```
 
   .   ____          _            __ _ _

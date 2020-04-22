@@ -224,7 +224,7 @@ public class TestRestCrt {
 	}
     ...
     ```
-    - ``` value="/msg/{id1}/{id2}" ``` : définit des variables dans l'URL qui seront définis par l'utilisateur lors de l'envoi de L'URL.
+    - ``` value="/msg/{id1}/{id2}" ``` : définit des variables dans l'URL qui seront définies par l'utilisateur lors de l'envoi de L'URL.
     - ```@PathVariable String id1, @PathVariable String id2``` : récupère les variables de l'URL et les met à disposition de la fonction.
     ```java
     @RequestMapping(method=RequestMethod.GET,value="/parameters")
@@ -265,7 +265,7 @@ public class TestRestCrt {
   
 <img alt="img PostMan Add Hero" src="./images/ResultParams.jpg" width="500">
 
-## 3 Persistance des données et service
+## 3 Persistance des données et Services
 - Springboot offre la possibilité de faire de l'injection de dépendance. Ainsi des instances de classe crées par le serveur pourront être utilisées dans d'autres classes
 
 ### 3.1 Service Springboot
@@ -294,7 +294,7 @@ public class TestRestCrt {
     ```
 
 - Explications:
-    - ```@Service``` : annotation permettant de créer un singleton de la classe courante et permettant l'injection de dépendance dans une autre classe.
+    - ```@Service``` : annotation permettant de créer un singleton de la classe courante et permettant l'injection de dépendances dans une autre classe.
 
 
 - Créer le fichier ```HeroRestCrt.java``` dans le package ```com.sp.rest``` comme suit:
@@ -335,7 +335,7 @@ public class TestRestCrt {
   - Lancer votre application
     - Clic droit sur le fichier ```SpAppHero```, ```Run AS``` -> ```Java Application```.
 - Tester:  add User:
-  - A l'aide de Postman, effecuter la requête suivante:
+  - A l'aide de Postman, effectuer la requête suivante:
 
 <img alt="img PostMan Add Hero Rest" src="./images/PostManAddHeroRest.jpg" width="500">
 
@@ -416,14 +416,14 @@ public interface HeroRepository extends CrudRepository<Hero, Integer> {
     public interface HeroRepository extends CrudRepository<Hero, Integer> {
     ...
     ```
-    - Springboot nous permet de créer un DAO (Data Access Object) automatiquement à partir de l'interface présentée ici. Cette interface précise que le futur DAO sera un CRUD (Create Read Update Delete) et portera sur l'objet ```Hero```qui a pour clé un ```Integer```. Springboot va alors se charger de créer un singleton DAO à partir de ce fichier avec les méthodes permettant d'ajouter, de mettre à jours, d'accéder et de supprimer des objets ```Hero```.
+    - Springboot nous permet de créer un DAO (Data Access Object) automatiquement à partir de l'interface présentée ici. Cette interface précise que le futur DAO sera un CRUD (Create Read Update Delete) et portera sur l'objet ```Hero```qui a pour clé un ```Integer```. Springboot va alors se charger de créer un singleton DAO à partir de ce fichier avec les méthodes permettant d'ajouter, de mettre à jour, d'accéder et de supprimer des objets ```Hero```.
     
     ```java
     ...
     public List<Hero> findByName(String name);
     ...
     ```
-    - Ici on définit une méthode grace à une convention de nommmage ```findBy<attributeName>```. Springboot va alors créer une méthode associée qui effectuera une requête (e.g sql) permettant de récupérer tous les ```Hero``` qui possède le ```name``` égale au ```name``` passé en paramètre.
+    - Ici on définit une méthode grace à une convention de nommmage ```findBy<attributeName>```. Springboot va alors créer une méthode associée qui effectuera une requête (e.g sql) permettant de récupérer tous les ```Hero``` qui possèdent le ```name``` égal au ```name``` passé en paramètre.
 
 ### 3.2.3 Modification du service
 - Modifier le fichier ```HeroService``` comme suit:
@@ -466,7 +466,7 @@ public class HeroService {
 	HeroRepository hRepository;
     ...
     ```
-    - Permet d'injecter l'objet HeroRepository créé par Springboot
+    - Permet d'injecter l'objet ```HeroRepository``` créé par Springboot
 
     ```java
     ...
@@ -486,7 +486,7 @@ public class HeroService {
 
 <img alt="img PostMan Add Hero Rest" src="./images/PostManAddHeroRest.jpg" width="500">
 
-  - dans un WebBrowser appler ensuite l'URL suivante avec l'id qui s'affiche dans la console de l'application:
+  - Dans un WebBrowser appeler ensuite l'URL suivante avec l'id qui s'affiche dans la console de l'application:
 ```
 127.0.0.1:8080/hero/1
 ```
@@ -496,7 +496,7 @@ public class HeroService {
   
 
 # 4 Changer la configuration par default du serveur Springboot
-- dans ```src/main/resources``` créer le fichier ```application.properties```
+- Dans ```src/main/resources``` créer le fichier ```application.properties```
 ```yaml
 server.address=127.0.0.1
 server.port=8081
@@ -518,13 +518,13 @@ spring.jpa.hibernate.ddl-auto=create
 
 ```
 - Explications:
-  - ```server.address=127.0.0.1``` : permet de rédéfinir l'adresse de notre server
-  - ``` server.port=8081 ``` : permet de rédéfinir le port de notre server
-  - ```spring.jpa.hibernate.ddl-auto=create``` : permet de définir le comportement de notre application. Ici ```create``` indique à JPA que la base de données sera reconstruite à chaque démarrage de l'application (perte de données à chaque redémarrage). ```validate``` permet d'utilisée une base de données déjà créée.
+  - ```server.address=127.0.0.1``` : permet de rédéfinir l'adresse de notre serveur
+  - ``` server.port=8081 ``` : permet de rédéfinir le port de notre serveur
+  - ```spring.jpa.hibernate.ddl-auto=create``` : permet de définir le comportement de notre application. Ici ```create``` indique à JPA que la base de données sera reconstruite à chaque démarrage de l'application (perte de données à chaque redémarrage). ```validate``` permet d'utiliser une base de données déjà créée.
 
 - Usage d'une base de données extérieure
-  - Dans le cas ou vous souhaitez utiliser une base de données extérieur (e.g Postgresql) vous devez
-    - ajouter la dépendance du connecteur JDBC au pom.xml et commenter les connecteurs non utilisés.
+  - Dans le cas ou vous souhaitez utiliser une base de données extérieure (e.g Postgresql) vous devez
+    - Ajouter la dépendance du connecteur JDBC au pom.xml et commenter les connecteurs non utilisés.
 
     ```xml
     ...
