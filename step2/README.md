@@ -36,7 +36,7 @@ Dans ce tuto., nous allons mettre en oeuvre des tests unitaires et d'intégratio
 " width="300">
 
 ## 3 Création de tests unitaires simples
-Dans cette Section nous allons créer des tests unitaires sur ```Hero.java```. Nous allons tester respectivement la création d'un object avec paramètre ainsi que l'affichage de cet Objet.
+Dans cette section nous allons créer des tests unitaires sur ```Hero.java```. Nous allons tester respectivement la création d'un object avec des paramètres ainsi que l'affichage de cet objet.
 
 ### 3.1 Création de HeroTest
   - Créer le package ```com.sp.model``` dans ```src/test/java```
@@ -130,7 +130,7 @@ public class HeroTest {
         ...
     }
   ```
-    - L'annotation ```@Test``` permet d'indiquer au Framework de test (JUNIT) que la méthode est une méthode de test
+    - L'annotation ```@Test``` permet d'indiquer au Framework de tests (JUNIT) que la méthode est une méthode de test
 
 ### 3.2 Exécution de notre fonction de Test
 - Exécuter votre test en utilisant le Framework Junit sous Eclipse directement
@@ -181,7 +181,7 @@ msg:normalString1, msg2:normalString1, msg3:normalString1, msg4:500
 ```
 
 ## 4 Création de tests sur le Repository
-Dans cette Section nous allons créer des tests pour le sur ```HeroRepository.java```. Pour vérifier le fonctionnement du contrôleur nous aurons besoin de simuler une base de données embarquée
+Dans cette Section nous allons créer des tests pour ```HeroRepository.java```. Pour vérifier le fonctionnement du contrôleur nous aurons besoin de simuler une base de données embarquée
 
 ### 4.1 Création de HeroRepositoryTest
   - Créer le package ```com.sp.repository``` dans ```src/test/java```
@@ -260,13 +260,13 @@ Dans cette Section nous allons créer des tests pour le sur ```HeroRepository.ja
     }
 ```
 - Explications:
-  -    ``` @RunWith(SpringRunner.class)``` permet de lancer un contexte Springboot et des créer des objets spécifiquement pour le test. Ici nous permet d'accéder à ```HeroRepository hrepo;```
+  -    ``` @RunWith(SpringRunner.class)``` permet de lancer un contexte Springboot et de créer des objets spécifiquement pour le test. Ici nous permet d'accéder à ```HeroRepository hrepo;```
   -   ``` @DataJpaTest ``` permet de créer une base de données temporaire pour l'exécution du test
     ```java
         @Autowired
         HeroRepository hrepo;
     ```
-  - il est possible d'injecter un HeroRepository grâce à ``` @RunWith(SpringRunner.class)``` et au contexte Springboot créé pour le test.
+  - Il est possible d'injecter un ```HeroRepository``` grâce à ``` @RunWith(SpringRunner.class)``` et au contexte Springboot créé pour le test.
 
 ### 4.2 Exécution de notre fonction de Test
 - Exécuter votre test en utilisant le Framework Junit sous Eclipse directement
@@ -282,7 +282,7 @@ Dans cette Section nous allons créer des tests pour le sur ```HeroRepository.ja
 
 
 ## 5 Création de tests sur le RestController
-Dans cette Section nous allons créer des tests pour le sur ```HeroService.java```. Pour vérifier le fonctionnement du contrôleur nous aurons besoin de simuler le comportement d'autres controleur (e.g ```HeroRepository```).
+Dans cette Section nous allons créer des tests pour ```HeroService.java```. Pour vérifier le fonctionnement du contrôleur nous aurons besoin de simuler le comportement d'autres controleurs (e.g ```HeroRepository```).
 
 ### 5.1 Création de HeroServiceTest
   - Créer le package ```com.sp.service``` dans ```src/test/java```
@@ -338,7 +338,7 @@ public class HeroServiceTest {
 	    private HeroService hService;
     ...
     ```
-    - Injection du service HeroService. Il s'agit du seul object, ```Bean```, accessible dans ce contexte de test (défini dans ```@WebMvcTest(value = HeroService.class)``` ).
+    - Injection du service ```HeroService```. Il s'agit du seul object, ```Bean```, accessible dans ce contexte de test (défini dans ```@WebMvcTest(value = HeroService.class)``` ).
     ```java
     ...
       @MockBean
@@ -354,7 +354,7 @@ public class HeroServiceTest {
 				).thenReturn(Optional.ofNullable(tmpHero));
     ...
     ```
-    - Redéfini le comportement attendu par hRepo. Dans notre cas lors de l'appel de ```hRepo.findById``` avec comme argument n'importe quel objet (```Mockito.any()```), cette méthode va retourner toujours le même objet ```Optional.ofNullable(tmpHero)```.
+    - Redéfini le comportement attendu par ```hRepo```. Dans notre cas, lors de l'appel de ```hRepo.findById``` avec comme argument n'importe quel objet (```Mockito.any()```), cette méthode va retourner toujours le même objet ```Optional.ofNullable(tmpHero)```.
 
     ```java
     ...
@@ -378,7 +378,7 @@ public class HeroServiceTest {
 
 
 ## 6 Création de tests sur le RestController
-Dans cette Section nous allons créer des tests pour le sur ```HeroRestCrt.java```. Pour vérifier le fonctionnement du contrôleur nous aurons besoin de simuler l'envoie de requête HTTP.
+Dans cette Section nous allons créer des tests pour  ```HeroRestCrt.java```. Pour vérifier le fonctionnement du contrôleur nous aurons besoin de simuler l'envoi de requête HTTP.
 
 ### 6.1 Création de HeroRestCrt
   - Créer le package ```com.sp.rest``` dans ```src/test/java```
@@ -438,8 +438,8 @@ public class HeroRestCrtTest {
 }
 ```
 - Explications:
-    - ```@RunWith(SpringRunner.class)``` : permet de lancer un contexte Springboot et des créer des objets spécifiquement pour le test. 
-    - ```@WebMvcTest(value = HeroRestCrt.class)``` : indique à Springboot de limiter le contexte de l'application pour ce test à l'objet ```HeroRestCrt```. Nous allons par la suite simuler le comportement des autres controller utilisés (e.g ```HeroService```). Le contexte de l'application à simuler se trouvera dans l'objet ```MockMvc mockMvc```  (https://reflectoring.io/spring-boot-web-controller-test/) 
+    - ```@RunWith(SpringRunner.class)``` : permet de lancer un contexte Springboot et de créer des objets spécifiquement pour le test. 
+    - ```@WebMvcTest(value = HeroRestCrt.class)``` : indique à Springboot de limiter le contexte de l'application pour ce test à l'objet ```HeroRestCrt```. Nous allons par la suite simuler le comportement des autres controlleurs utilisés (e.g ```HeroService```). Le contexte de l'application à simuler se trouvera dans l'objet ```MockMvc mockMvc```  (https://reflectoring.io/spring-boot-web-controller-test/) 
 
   ```java
   ...
@@ -461,7 +461,7 @@ public class HeroRestCrtTest {
 				hService.getHero(Mockito.anyInt())
 				).thenReturn(mockHero);
   ```
-   - Redéfini le comportement attendu par hService. Dans notre cas lors de l'appel de ```hService.getHero``` avec comme argument n'importe quel entier (```Mockito.anyInt()```), cette méthode va retourner toujours le même objet ```mockHero```.
+   - Redéfinit le comportement attendu par hService. Dans notre cas lors de l'appel de ```hService.getHero``` avec comme argument n'importe quel entier (```Mockito.anyInt()```), cette méthode va retourner toujours le même objet ```mockHero```.
 
   ```java
   ...
