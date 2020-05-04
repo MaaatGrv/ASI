@@ -1,3 +1,4 @@
+**Author**: Jacques Saraydaryan, All rights reserved
 # Step 0: Création d'un projet Maven pour Springboot
 
 ## 1 Contexte

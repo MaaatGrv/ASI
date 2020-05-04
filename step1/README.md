@@ -1,3 +1,4 @@
+**Author**: Jacques Saraydaryan, All rights reserved
 # Step 1: Création d'une application Springboot
 
 ## 1 Création de l'application

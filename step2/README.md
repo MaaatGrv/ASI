@@ -1,3 +1,4 @@
+**Author**: Jacques Saraydaryan, All rights reserved
 # Step 2: Mise en place de Tests sur une application Springboot
 
 ## 1 Contexte
