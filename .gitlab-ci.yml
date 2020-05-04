@@ -22,13 +22,13 @@ job_build:
 job_test:
   stage: test
   script:
-    - mvn ./step3/pom.xml test
+    - mvn -f ./step3/pom.xml test
 
 # definition un nouveau job
 job_package:
   stage: package
   script:
-    - mvn ./step3/pom.xml package
+    - mvn -f ./step3/pom.xml package
   # definition d'un livrable issue de la compilation (et des autres opérations demandées), disponible au téléchargement
   artifacts:
     paths:
