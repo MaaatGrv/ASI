@@ -13,6 +13,11 @@ stages:
   - package
   - deploy
 
+# Define a cache storing maven dependencies in order to not download again dependencies on each job step
+cache:
+  paths:
+    - .m2/repository
+
 # definition d'un job, à quelle étape il sera executé (stage), le script a executé (e.g mvn compile)
 job_build:
   stage: build
@@ -45,6 +50,8 @@ job_deploy:
     - apt-get install -y ruby-dev
     - gem install dpl
     - dpl --provider=heroku --app=$HEROKU_APP_PRODUCTION --api-key=$HEROKU_API_KEY
+    
+
   only:
     - master
     - dev
