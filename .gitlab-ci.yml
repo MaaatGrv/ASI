@@ -34,3 +34,18 @@ job_package:
     paths:
     - ./step3/target/*.jar
     expire_in: 1 week
+
+# definition un nouveau job pour le déploiement continu
+deploy_dev:
+ stage: deploy
+ image: ruby:2.3
+ script:
+ - apt-get update -qy
+ - apt-get install -y ruby-dev
+ - gem install dpl
+ - dpl --provider=heroku --app=$HEROKU_APP_PRODUCTION --api-key=$HEROKU_API_KEY
+ environment:
+ name: dev
+ only:
+ - master
+ 
