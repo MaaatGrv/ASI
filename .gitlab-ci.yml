@@ -8,9 +8,9 @@ before_script:
 # definition de l'ordre d'execution des jobs 
 # (e.g tous les jobs qui ont 'state:build' seront executés en premiers, puis tous les jobs de 'state:test' etc..)
 stages:
-  - build
-  - test
-  - package
+#  - build
+#  - test
+#  - package
   - deploy
 
 # Define a cache storing maven dependencies in order to not download again dependencies on each job step
