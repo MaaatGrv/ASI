@@ -57,3 +57,44 @@ job_package:
     expire_in: 1 week
 
 ```
+
+
+```yaml
+...
+stages:
+  - build
+  - test
+  - package
+  - deploy
+
+...
+
+# definition un nouveau job pour le déploiement continu
+job_deploy:
+  stage: deploy
+  image: ruby:2.3
+  script:
+    - apt-get update -qy
+    - apt-get install -y ruby-dev
+    - gem install dpl
+    - dpl --provider=heroku --app=$HEROKU_APP_PRODUCTION --api-key=$HEROKU_API_KEY
+    
+  only:
+    - master
+    - dev
+
+```
+
+  - Pour les projets Maven Springboot heroku exécute cette commande par défaut:
+
+```
+java -Dserver.port=$PORT $JAVA_OPTS -jar target/*.jar
+
+```
+
+```ProFile``` permet au serveur Heroku de déterminer la commande à lancer pour démarrer l'application (ref https://devcenter.heroku.com/articles/procfile)
+
+
+```
+web: java -Dserver.port=$PORT $JAVA_OPTS -jar step3/target/*.jar
+```
