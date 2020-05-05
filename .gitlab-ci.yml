@@ -11,6 +11,7 @@ stages:
   - build
   - test
   - package
+  - deploy
 
 # definition d'un job, à quelle étape il sera executé (stage), le script a executé (e.g mvn compile)
 job_build:
@@ -36,7 +37,7 @@ job_package:
     expire_in: 1 week
 
 # definition un nouveau job pour le déploiement continu
-deploy_dev:
+job_deploy:
  stage: deploy
  image: ruby:2.3
  script:
