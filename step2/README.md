@@ -282,7 +282,7 @@ Dans cette Section nous allons créer des tests pour ```HeroRepository.java```. 
   - Clic droit sur le projet ```RUN AS```-> ``` MAVEN TEST```
 
 
-## 5 Création de tests sur le RestController
+## 5 Création de tests sur le Service
 Dans cette Section nous allons créer des tests pour ```HeroService.java```. Pour vérifier le fonctionnement du contrôleur nous aurons besoin de simuler le comportement d'autres controleurs (e.g ```HeroRepository```).
 
 ### 5.1 Création de HeroServiceTest
