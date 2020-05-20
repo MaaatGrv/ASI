@@ -349,7 +349,7 @@ public class TestRestCrt {
 
   - Appeler l'Url suivante dans un Web Browser:
     ```
-    http://127.0.0.1:8080/msg/myPath1/myPath2
+    http://127.0.0.1:8080/hero/15
     ```
      - Le résultat obtenu:
   
