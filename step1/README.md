@@ -287,7 +287,7 @@ public class TestRestCrt {
         }
         
         public Hero getHero(int id) {
-            Hero h =new Hero(2, "jdoe", "VeryFast", 20, "http://fairedesgifs.free.fr/da/sh/flash/flash-(4).gif");
+            Hero h =new Hero(2, "Flash", "VeryFast", 20, "http://fairedesgifs.free.fr/da/sh/flash/flash-(4).gif");
             return h;
         }
 
