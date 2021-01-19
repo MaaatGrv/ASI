@@ -201,7 +201,7 @@ stages:
 # definition un nouveau job pour le déploiement continu
 job_deploy:
   stage: deploy
-  image: ruby:2.3
+  image: ruby:2.4
   script:
     - apt-get update -qy
     - apt-get install -y ruby-dev
@@ -226,7 +226,7 @@ job_deploy:
   ...
   job_deploy:
     stage: deploy
-    image: ruby:2.3
+    image: ruby:2.4
     script:
       - apt-get update -qy
       - apt-get install -y ruby-dev
@@ -286,7 +286,7 @@ job_package:
 # (grave au pom.xml à la racine) et lancer l'application au démarrage
 job_deploy:
   stage: deploy
-  image: ruby:2.3
+  image: ruby:2.4
   script:
     - apt-get update -qy
     - apt-get install -y ruby-dev
