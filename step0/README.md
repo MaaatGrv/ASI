@@ -181,6 +181,10 @@ Springboot est un framework qui permet la création rapide d'applications notamm
 
 - Votre projet est maintenant prêt pour utiliser Springboot
 
+## 2.2 bis https://start.spring.io/
+Springboot propose également un générateur de projet permettant de sélectionner les dépendances nécessaires et générant un projet (.zip) maven.
+La norme reste d'aller générer son projet (ou son fichier maven pom.xml) sur ce site `https://start.spring.io/`.
+
 ### 2.3 Création d'un application vide Springboot
 - Dans ```src/main/java``` ajouter le package ```com.sp```
 - Dans les packages ```com.sp```, ajouter ```SpAppHero.java``` comme suit:
