@@ -46,18 +46,19 @@ Dans cette section nous allons créer des tests unitaires sur ```Hero.java```. N
 ```java
 package com.sp.model;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.ArrayList;
 import java.util.List;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
 
 public class HeroTest {
 	private List<String> stringList;
 	private List<Integer> intList;
 
-	@Before
+	@BeforeEach
 	public void setUp() {
 		System.out.println("[BEFORE TEST] -- Add Hero to test");
 		stringList = new ArrayList<String>();
@@ -70,7 +71,7 @@ public class HeroTest {
 		intList.add(-1);
 	}
 
-	@After
+	@AfterEach
 	public void tearDown() {
 		System.out.println("[AFTER TEST] -- CLEAN hero list");
 		stringList = null;
@@ -108,18 +109,18 @@ public class HeroTest {
 - Explications:
   ```java
     ...
-    @Before
+    @BeforeEach
 	public void setUp() {
         ...
   ```
-  - L'annotation ```@Before``` permet d'exécuter une fonction ```AVANT``` chaque test
+  - L'annotation ```@BeforeEach``` permet d'exécuter une fonction ```AVANT``` chaque test
   ```java
     ...
-	@After
+	@AfterEach
 	public void tearDown() {
         ...
   ```
-  - L'annotation ```@After``` permet d'exécuter une fonction ```APRES``` chaque test
+  - L'annotation ```@AfterEach``` permet d'exécuter une fonction ```APRES``` chaque test
   ```java
     ...
 	@Test
@@ -131,7 +132,7 @@ public class HeroTest {
         ...
     }
   ```
-    - L'annotation ```@Test``` permet d'indiquer au Framework de tests (JUNIT) que la méthode est une méthode de test
+    - L'annotation ```@Test``` permet d'indiquer au Framework de tests (JUNIT 5 Jupiter) que la méthode est une méthode de test
 
 ### 3.2 Exécution de notre fonction de Test
 - Exécuter votre test en utilisant le Framework Junit sous Eclipse directement
@@ -191,32 +192,33 @@ Dans cette Section nous allons créer des tests pour ```HeroRepository.java```. 
 ```java
     package com.sp.repository;
 
-    import static org.junit.Assert.assertTrue;
-
     import java.util.ArrayList;
     import java.util.List;
-    import org.junit.After;
-    import org.junit.Before;
-    import org.junit.Test;
-    import org.junit.runner.RunWith;
+	import org.junit.jupiter.api.AfterEach;
+	import org.junit.jupiter.api.BeforeEach;
+	import org.junit.jupiter.api.Test;
+	import org.junit.jupiter.api.extension.ExtendWith;
+
     import org.springframework.beans.factory.annotation.Autowired;
     import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-    import org.springframework.test.context.junit4.SpringRunner;
+	import org.springframework.test.context.junit.jupiter.SpringExtension;
     import com.sp.model.Hero;
 
-    @RunWith(SpringRunner.class)
+	import static org.junit.jupiter.api.Assertions.assertTrue;
+
+    @ExtendWith(SpringExtension.class)
     @DataJpaTest
     public class HeroRepositoryTest {
 
         @Autowired
         HeroRepository hrepo;
 
-        @Before
+        @BeforeEach
         public void setUp() {
             hrepo.save(new Hero(1, "jdoe", "strong", 100, "https//url.com"));
         }
 
-        @After
+        @AfterEach
         public void cleanUp() {
             hrepo.deleteAll();
         }
@@ -261,13 +263,13 @@ Dans cette Section nous allons créer des tests pour ```HeroRepository.java```. 
     }
 ```
 - Explications:
-  -    ``` @RunWith(SpringRunner.class)``` permet de lancer un contexte Springboot et de créer des objets spécifiquement pour le test. Ici nous permet d'accéder à ```HeroRepository hrepo;```
+  -    ``` @ExtendWith(SpringExtension.class)``` permet de lancer un contexte Springboot et de créer des objets spécifiquement pour le test. Ici nous permet d'accéder à ```HeroRepository hrepo;```
   -   ``` @DataJpaTest ``` permet de créer une base de données temporaire pour l'exécution du test
     ```java
         @Autowired
         HeroRepository hrepo;
     ```
-  - Il est possible d'injecter un ```HeroRepository``` grâce à ``` @RunWith(SpringRunner.class)``` et au contexte Springboot créé pour le test.
+  - Il est possible d'injecter un ```HeroRepository``` grâce à ``` @ExtendWith(SpringExtension.class)``` et au contexte Springboot créé pour le test.
 
 ### 4.2 Exécution de notre fonction de Test
 - Exécuter votre test en utilisant le Framework Junit sous Eclipse directement
@@ -292,22 +294,22 @@ Dans cette Section nous allons créer des tests pour ```HeroService.java```. Pou
 ```java
 package com.sp.service;
 
-import static org.junit.Assert.assertTrue;
-
 import java.util.Optional;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import com.sp.model.Hero;
 import com.sp.repository.HeroRepository;
 
-@RunWith(SpringRunner.class)
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+@ExtendWith(SpringExtension.class)
 @WebMvcTest(value = HeroService.class)
 public class HeroServiceTest {
 
@@ -331,7 +333,7 @@ public class HeroServiceTest {
 
 ```
   - Explications:
-    - ```@RunWith(SpringRunner.class)``` : permet de lancer un contexte Springboot et des créer des objets spécifiquement pour le test. 
+    - ```@ExtendWith(SpringExtension.class)``` : permet de lancer un contexte Springboot et des créer des objets spécifiquement pour le test. 
     - ```@WebMvcTest(value = HeroService.class)``` : indique à Springboot de limiter le contexte de l'application pour ce test à l'objet ```HeroService```. 
     ```java
     ...
@@ -388,24 +390,28 @@ Dans cette Section nous allons créer des tests pour  ```HeroRestCrt.java```. Po
 ```java
 package com.sp.rest;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import com.sp.model.Hero;
+import com.sp.service.HeroService;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 import org.skyscreamer.jsonassert.JSONAssert;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.RequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
-import com.sp.model.Hero;
-import com.sp.service.HeroService;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@RunWith(SpringRunner.class)
+
+@ExtendWith(SpringExtension.class)
 @WebMvcTest(value = HeroRestCrt.class)
 public class HeroRestCrtTest {
 	
@@ -426,7 +432,10 @@ public class HeroRestCrtTest {
 
 		RequestBuilder requestBuilder = MockMvcRequestBuilders.get("/hero/50").accept(MediaType.APPLICATION_JSON);
 
-		MvcResult result = mockMvc.perform(requestBuilder).andReturn();
+		MvcResult result = mockMvc.perform(requestBuilder)
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.id").value(1))
+				.andReturn();
 
 		System.out.println(result.getResponse().getContentAsString());
 		String expectedResult="{\"id\":1,\"name\":\"jdoe\",\"superPowerName\":\"strong\",\"superPowerValue\":100,\"imgUrl\":\"https//url.com\"}";
@@ -439,7 +448,7 @@ public class HeroRestCrtTest {
 }
 ```
 - Explications:
-    - ```@RunWith(SpringRunner.class)``` : permet de lancer un contexte Springboot et de créer des objets spécifiquement pour le test. 
+    - ```@ExtendWith(SpringExtension.class)``` : permet de lancer un contexte Springboot et de créer des objets spécifiquement pour le test. 
     - ```@WebMvcTest(value = HeroRestCrt.class)``` : indique à Springboot de limiter le contexte de l'application pour ce test à l'objet ```HeroRestCrt```. Nous allons par la suite simuler le comportement des autres controlleurs utilisés (e.g ```HeroService```). Le contexte de l'application à simuler se trouvera dans l'objet ```MockMvc mockMvc```  (https://reflectoring.io/spring-boot-web-controller-test/) 
 
   ```java
@@ -483,6 +492,18 @@ public class HeroRestCrtTest {
 				.getContentAsString(), false);
   ```
   - Compare le contenu de la requête au résultat attendu (conversion automatique des string au format JSON)
+
+  - Pour une validation plus facile vous pouvez utiliser les assert du framework de test :
+      ```java
+      ...
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.id").value(1)).andReturn();
+      ...
+      ```
+  -  ```status().isOk()``` : Verifie le code HTTP de retour de l'API (ou status().is(200))
+  -  ```jsonPath("$.id").value(1)``` : Permet de valider que le champ id du json est égale à 1. ```$``` étant l'objet de base retourner par l'API, et ```.id``` le champ ayant la key id
+    
+
 
 
 ### 6.2 Exécution de notre fonction de Test

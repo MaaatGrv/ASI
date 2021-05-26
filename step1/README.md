@@ -64,7 +64,7 @@ public class TestRestCrt {
  \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
   '  |____| .__|_| |_|_| |_\__, | / / / /
  =========|_|==============|___/=/_/_/_/
- :: Spring Boot ::        (v2.1.7.RELEASE)
+ :: Spring Boot ::        (v2.5.0)
 
 2020-04-21 14:41:34.774  INFO 18404 --- [           main] com.sp.SpAppHero                         : Starting SpAppHero on LAPTOP-GUASGB11 with PID 18404 (D:\Data\cpe_cours\ASI\ASI-1\addDocs\ws\asi1-springboot-tuto\step1\target\classes started by jsaraydaryan in D:\Data\cpe_cours\ASI\ASI-1\addDocs\ws\asi1-springboot-tuto\step1)
 2020-04-21 14:41:34.794  INFO 18404 --- [           main] com.sp.SpAppHero                         : No active profile set, falling back to default ...

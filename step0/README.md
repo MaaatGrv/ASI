@@ -66,7 +66,7 @@ Springboot est un framework qui permet la création rapide d'applications notamm
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>2.1.7.RELEASE</version>
+		<version>2.5.0</version>
 		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
 	
@@ -123,7 +123,7 @@ Springboot est un framework qui permet la création rapide d'applications notamm
     <parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>2.1.7.RELEASE</version>
+		<version>2.5.0</version>
 		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
     ...
@@ -232,7 +232,7 @@ public class SpAppHero {
  \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
   '  |____| .__|_| |_|_| |_\__, | / / / /
  =========|_|==============|___/=/_/_/_/
- :: Spring Boot ::        (v2.1.7.RELEASE)
+ :: Spring Boot ::        (v2.5.0)
 
 2020-04-21 10:13:41.302  INFO 17840 --- [           main] com.sp.SpAppHero                         : Starting SpAppHero on LAPTOP with PID 17840 
 ...
