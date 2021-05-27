@@ -477,6 +477,45 @@ public class HeroService {
     ...
     ```
     - ```HeroRepository``` possède des méthodes prédéfinies lui permettant de jouer son rôle de CRUD.
+<details>
+  <summary>En savoir plus sur les Optional (Java 8)</summary>
+
+Les Repository renvoient des Optional (ou des lists). Les optionals ont été ajoutés dans Java 8 pour se prémunire contre les objets nulls.
+Dans l'exemple ci-dessus, vous chercher un utilisateur par identifiant. Potentiellement, aucun utilisateur n'existe pour cet identifiant.
+
+L'Optional peut etre vu comme une enveloppe ou wrapper qui contient un objet ou vide.
+Les écritures peuvent ensuite être simplifier :
+```java
+Optional<Hero> hOpt;
+Hero h = hOpt.orElse(new Hero());
+Hero h2 = hOpt.orElseThrow(() => new RuntimeException("Pas de user"));
+String nameField = hOpt.map(hero => hero.getName()).orElseThrow(() => new RuntimeException("Pas de user"));
+```
+
+Explications : 
+* h : Valeur de l'optionnel OU possède une valeur par défault (new Hero())
+* h2 : Valeur de  l'optional OU throw une exception pour couper le traitement (si pas de héro, impossible de continuer la méthode)
+* nameField: Recupère le champ name du héro si présent OU throw une exception
+
+Vous devez gérer le cas null, toujours, mais de façon élégante (orElse, orElseThrow). 
+Ca remplace l'écriture d'un if pour gérer le cas null.
+
+Dans l'exemple précédent, vous pouvez simplement écrire 
+```java
+	public Hero getHero(int id) {
+		return hRepository.findById(id).orElseThrow(() => new RuntimeExcpetion("No hero with id = ".concat(id)));
+	}
+
+```
+
+Une mauvaise utilisation du Optional :
+```java
+    return hRepository.findById(id).get().getId();
+```
+L'optionnel peut être null, encore une fois, et vous allez simplement avoir un NullPointerException !
+Le ```.get()``` sur un optionnel peut être utiliser UNIQUEMENT si vous avez checker la précense avec un ```if (hOpt.isPresent())``` au préalable.
+</details>
+
 
 ### 3.2.4 Test de l'application
 - Tester votre application:
