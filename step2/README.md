@@ -1,498 +1,558 @@
 **Author**: Jacques Saraydaryan, All rights reserved
-# Step 2: Mise en place de Tests sur une application Springboot
+# Step 2: Création d'une application Springboot: Web Service Rest
 
-## 1 Contexte
-Afin de mettre en place de la qualité logicielle, il est indispensable de pouvoir tester son application. Il existe plusieurs types de tests:
-- Tests Systèmes : testent l'ensemble de l'application sur des scénarios donnés
-- Tests d'Intégration: testent un sous-ensemble de fonctionnalité de l'application (e.g authentification d'un utilisateur)
-- Tests unitaires: testent une fonction d'une classe
+## 1 Création de l'application
+- Suivre les étapes de la [Step0](../step0/README.md) et créer un projet SpringBoot avec les propriétés suivantes:
+  - ```GroupeId```: com.tuto.springboot
+  - ```ArtefactId```: SPWebAppStep1
+  - ```Packaging```: jar
 
-<img alt="img Test" src="https://blog.octo.com/wp-content/uploads/2018/06/pyramide_globale.png
-" width="600">
+## 2 Création d'un Contexte REST
 
-Les tests unitaires testent de petites portions de fonctionnalités de façon indépendante. Ces tests nombreux permettent de vérifier que nos modifications n'ont pas altéré le comportement d'autres fonctionnalités dans l'application. Ils vont permettre de tester la non-régression de notre application.
+### 2.1 Création d'un RestController Simple
 
-Dans ce tuto., nous allons mettre en oeuvre des tests unitaires et d'intégration dans une application SpringBoot.
-
-## 2 Configuration du projet
-- Vérifier que vous avez bien réalisé la [step1](../step1/README.md), nous allons repartir sur la base du projet créé lors de cette étape.
-- Dans le fichier ```pom.xml``` vérifier que les éléments suivant sont présents:
-
-```xml
-...
-    <dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-test</artifactId>
-			<scope>test</scope>
-	</dependency>
-...
-
-```
-- Cette dépendance va permettre de récupérer l'ensemble des outils pour les tests (e.g JUnit, Hamcrest and Mockito )
-
-- Maven nous propose une structure permettant d'isoler les tests dans des packages séparés. En effet, lors de la production de notre archive finale, il sera plus facile de ne pas intégrer les tests à la version finales de notre application
-
-
-<img alt="img Maven Test" src="./images/MavenProjectStructure.jpg
-" width="300">
-
-## 3 Création de tests unitaires simples
-Dans cette section nous allons créer des tests unitaires sur ```Hero.java```. Nous allons tester respectivement la création d'un object avec des paramètres ainsi que l'affichage de cet objet.
-
-### 3.1 Création de HeroTest
-  - Créer le package ```com.sp.model``` dans ```src/test/java```
-  - Créer le fichier ```HeroTest.java``` comme suit:
+#### 2.1.1 Création du RestController 
+- Dans ```src/main/java``` ajouter le package ```com.sp```
+- Dans les packages ```com.sp``` ajouter ```SpAppHero.java``` comme suit:
 
 ```java
-package com.sp.model;
+package com.sp;
 
-import static org.junit.Assert.assertTrue;
-import java.util.ArrayList;
-import java.util.List;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-public class HeroTest {
-	private List<String> stringList;
-	private List<Integer> intList;
-
-	@Before
-	public void setUp() {
-		System.out.println("[BEFORE TEST] -- Add Hero to test");
-		stringList = new ArrayList<String>();
-		intList = new ArrayList<Integer>();
-		stringList.add("normalString1");
-		stringList.add("normalString2");
-		stringList.add(";:!;!::!;;<>");
-		intList.add(5);
-		intList.add(500);
-		intList.add(-1);
-	}
-
-	@After
-	public void tearDown() {
-		System.out.println("[AFTER TEST] -- CLEAN hero list");
-		stringList = null;
-		intList = null;
-	}
-
-	@Test
-	public void createHero() {
-		for(String msg:stringList) {
-			for(String msg2:stringList) {
-				for(String msg3:stringList) {
-					for(Integer msg4:intList) {
-						Hero h=new Hero(msg4, msg, msg2, msg4, msg3);
-						System.out.println("msg:"+msg+", msg2:"+msg2+", msg3:"+msg3+", msg4:"+msg4);
-						assertTrue(h.getId().intValue() == msg4.intValue());
-						assertTrue(h.getName() == msg);
-						assertTrue(h.getSuperPowerName() == msg2);
-						assertTrue(h.getSuperPowerValue() == msg4);
-						assertTrue(h.getImgUrl() == msg3);
-					}	
-				}	
-			}
-		}
-	}
+@SpringBootApplication
+public class SpAppHero {
 	
-	@Test
-	public void displayHero() {
-		Hero h=new Hero(1,"jdoe", "strong", 100, "https//url.com");
-		String expectedResult="HERO [1]: name:jdoe, superPowerName:strong, superPowerValue:100 imgUrl:https//url.com";
-		assertTrue(h.toString().equals(expectedResult));
-		
+	public static void main(String[] args) {
+		SpringApplication.run(SpAppHero.class,args);
 	}
 }
 ```
-- Explications:
-  ```java
-    ...
-    @Before
-	public void setUp() {
-        ...
-  ```
-  - L'annotation ```@Before``` permet d'exécuter une fonction ```AVANT``` chaque test
-  ```java
-    ...
-	@After
-	public void tearDown() {
-        ...
-  ```
-  - L'annotation ```@After``` permet d'exécuter une fonction ```APRES``` chaque test
-  ```java
-    ...
-	@Test
-	public void createHero() {
-        ...
-    }
-    @Test
-	public void displayHero() {
-        ...
-    }
-  ```
-    - L'annotation ```@Test``` permet d'indiquer au Framework de tests (JUNIT) que la méthode est une méthode de test
-
-### 3.2 Exécution de notre fonction de Test
-- Exécuter votre test en utilisant le Framework Junit sous Eclipse directement
-  - Clic droit sur le projet ```RUN AS```-> ``` JUNIT TEST```
-  - Le résultat suivant doit apparaite:
-
-
-<img alt="img Maven Test" src="./images/JunitExecution1.jpg
-" width="400">
-
-- Exécuter votre test en utilisant Maven
-  - Clic droit sur le projet ```RUN AS```-> ``` MAVEN TEST```
-
-   - Le résultat suivant doit apparaite à la console:
-
-```
-[INFO] Scanning for projects...
-[INFO] 
-[INFO] -----------------< com.tuto.springboot:SPWebAppStep2 >------------------
-[INFO] Building SPWebApp2 0.0.1-SNAPSHOT
-[INFO] --------------------------------[ jar ]---------------------------------
-[INFO] 
-...
-[INFO] 
-[INFO] -------------------------------------------------------
-[INFO]  T E S T S
-[INFO] -------------------------------------------------------
-[INFO] Running com.sp.model.HeroTest
-[BEFORE TEST] -- Add Hero to test
-msg:normalString1, msg2:normalString1, msg3:normalString1, msg4:5
-msg:normalString1, msg2:normalString1, msg3:normalString1, msg4:500
-...
-[AFTER TEST] -- CLEAN hero list
-[BEFORE TEST] -- Add Hero to test
-[AFTER TEST] -- CLEAN hero list
-[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.257 s - in com.sp.model.HeroTest
-[INFO] 
-[INFO] Results:
-[INFO] 
-[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0
-[INFO] 
-[INFO] ------------------------------------------------------------------------
-[INFO] BUILD SUCCESS
-[INFO] ------------------------------------------------------------------------
-[INFO] Total time:  4.087 s
-[INFO] Finished at: 2020-04-22T11:28:20+02:00
-[INFO] ------------------------------------------------------------------------
-```
-
-## 4 Création de tests sur le Repository
-Dans cette Section nous allons créer des tests pour ```HeroRepository.java```. Pour vérifier le fonctionnement du contrôleur nous aurons besoin de simuler une base de données embarquée
-
-### 4.1 Création de HeroRepositoryTest
-  - Créer le package ```com.sp.repository``` dans ```src/test/java```
-  - Créer le fichier ```HeroRepositoryTest``` comme suit:
-
-```java
-    package com.sp.repository;
-
-    import static org.junit.Assert.assertTrue;
-
-    import java.util.ArrayList;
-    import java.util.List;
-    import org.junit.After;
-    import org.junit.Before;
-    import org.junit.Test;
-    import org.junit.runner.RunWith;
-    import org.springframework.beans.factory.annotation.Autowired;
-    import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-    import org.springframework.test.context.junit4.SpringRunner;
-    import com.sp.model.Hero;
-
-    @RunWith(SpringRunner.class)
-    @DataJpaTest
-    public class HeroRepositoryTest {
-
-        @Autowired
-        HeroRepository hrepo;
-
-        @Before
-        public void setUp() {
-            hrepo.save(new Hero(1, "jdoe", "strong", 100, "https//url.com"));
-        }
-
-        @After
-        public void cleanUp() {
-            hrepo.deleteAll();
-        }
-
-        @Test
-        public void saveHero() {
-            hrepo.save(new Hero(1, "test", "testPower", 1, "https//test_url.com"));
-            assertTrue(true);
-        }
-
-        @Test
-        public void saveAndGetHero() {
-            hrepo.deleteAll();
-            hrepo.save(new Hero(2, "test1", "testPower1", 1, "https//test1_url.com"));
-            List<Hero> heroList = new ArrayList<>();
-            hrepo.findAll().forEach(heroList::add);
-            assertTrue(heroList.size() == 1);
-            assertTrue(heroList.get(0).getSuperPowerName().equals("testPower1"));
-            assertTrue(heroList.get(0).getName().equals("test1"));
-            assertTrue(heroList.get(0).getImgUrl().equals("https//test1_url.com"));
-        }
-
-        @Test
-        public void getHero() {
-            List<Hero> heroList = hrepo.findByName("jdoe");
-            assertTrue(heroList.size() == 1);
-            assertTrue(heroList.get(0).getName().equals("jdoe"));
-            assertTrue(heroList.get(0).getSuperPowerName().equals("strong"));
-            assertTrue(heroList.get(0).getImgUrl().equals("https//url.com"));
-        }
-
-        @Test
-        public void findByName() {
-            hrepo.save(new Hero(1, "test1", "testPower1", 1, "https//test1_url.com"));
-            hrepo.save(new Hero(2, "test2", "testPower2", 2, "https//test2_url.com"));
-            hrepo.save(new Hero(3, "test2", "testPower2", 2, "https//test2_url.com"));
-            hrepo.save(new Hero(4, "test2", "testPower2", 2, "https//test2_url.com"));
-            List<Hero> heroList = new ArrayList<>();
-            hrepo.findByName("test2").forEach(heroList::add);
-            assertTrue(heroList.size() == 3);
-        }
-    }
-```
-- Explications:
-  -    ``` @RunWith(SpringRunner.class)``` permet de lancer un contexte Springboot et de créer des objets spécifiquement pour le test. Ici nous permet d'accéder à ```HeroRepository hrepo;```
-  -   ``` @DataJpaTest ``` permet de créer une base de données temporaire pour l'exécution du test
-    ```java
-        @Autowired
-        HeroRepository hrepo;
-    ```
-  - Il est possible d'injecter un ```HeroRepository``` grâce à ``` @RunWith(SpringRunner.class)``` et au contexte Springboot créé pour le test.
-
-### 4.2 Exécution de notre fonction de Test
-- Exécuter votre test en utilisant le Framework Junit sous Eclipse directement
-  - Clic droit sur le projet ```RUN AS```-> ``` JUNIT TEST```
-  - Le résultat suivant doit apparaite:
-
-
-<img alt="img Maven Test" src="./images/JunitExecution2.jpg
-" width="400">
-
-- Exécuter votre test en utilisant Maven
-  - Clic droit sur le projet ```RUN AS```-> ``` MAVEN TEST```
-
-
-## 5 Création de tests sur le Service
-Dans cette Section nous allons créer des tests pour ```HeroService.java```. Pour vérifier le fonctionnement du contrôleur nous aurons besoin de simuler le comportement d'autres controleurs (e.g ```HeroRepository```).
-
-### 5.1 Création de HeroServiceTest
-  - Créer le package ```com.sp.service``` dans ```src/test/java```
-  - Créer le fichier ```HeroService``` comme suit:
-  
-```java
-package com.sp.service;
-
-import static org.junit.Assert.assertTrue;
-
-import java.util.Optional;
-
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit4.SpringRunner;
-
-import com.sp.model.Hero;
-import com.sp.repository.HeroRepository;
-
-@RunWith(SpringRunner.class)
-@WebMvcTest(value = HeroService.class)
-public class HeroServiceTest {
-
-	@Autowired
-	private HeroService hService;
-
-	@MockBean
-	private HeroRepository hRepo;
-	
-	Hero tmpHero=new Hero(1, "jdoe", "strong", 100, "https//url.com");
-	
-	@Test
-	public void getHero() {
-		Mockito.when(
-				hRepo.findById(Mockito.any())
-				).thenReturn(Optional.ofNullable(tmpHero));
-		Hero heroInfo=hService.getHero(45);
-		assertTrue(heroInfo.toString().equals(tmpHero.toString()));
-	}
-}
-
-```
-  - Explications:
-    - ```@RunWith(SpringRunner.class)``` : permet de lancer un contexte Springboot et des créer des objets spécifiquement pour le test. 
-    - ```@WebMvcTest(value = HeroService.class)``` : indique à Springboot de limiter le contexte de l'application pour ce test à l'objet ```HeroService```. 
-    ```java
-    ...
-    	@Autowired
-	    private HeroService hService;
-    ...
-    ```
-    - Injection du service ```HeroService```. Il s'agit du seul object, ```Bean```, accessible dans ce contexte de test (défini dans ```@WebMvcTest(value = HeroService.class)``` ).
-    ```java
-    ...
-      @MockBean
-	    private HeroRepository hRepo;
-    ...
-    ```
-    - ``` @MockBean ``` permet de remplacer la ressource cible par une version "simulée" par Mockito mock. Nous pourrons ainsi définir le comportement attendu de cette ressource ciblée.
-
-    ```java 
-    ...
-    Mockito.when(
-				hRepo.findById(Mockito.any())
-				).thenReturn(Optional.ofNullable(tmpHero));
-    ...
-    ```
-    - Redéfini le comportement attendu par ```hRepo```. Dans notre cas, lors de l'appel de ```hRepo.findById``` avec comme argument n'importe quel objet (```Mockito.any()```), cette méthode va retourner toujours le même objet ```Optional.ofNullable(tmpHero)```.
-
-    ```java
-    ...
-    assertTrue(heroInfo.toString().equals(tmpHero.toString()));
-    ...
-    ```
-    - Test si le retour de ```hService.getHero``` correspond à la valeur attendue.
-
-### 5.2 Exécution de notre fonction de Test
-- Exécuter votre test en utilisant le Framework Junit sous Eclipse directement
-  - Clic droit sur le projet ```RUN AS```-> ``` JUNIT TEST```
-  - Le résultat suivant doit apparaite:
-
-
-<img alt="img Maven Test" src="./images/JunitExecution4.jpg
-" width="400">
-
-- Exécuter votre test en utilisant Maven
-  - Clic droit sur le projet ```RUN AS```-> ``` MAVEN TEST```
-
-
-
-## 6 Création de tests sur le RestController
-Dans cette Section nous allons créer des tests pour  ```HeroRestCrt.java```. Pour vérifier le fonctionnement du contrôleur nous aurons besoin de simuler l'envoi de requête HTTP.
-
-### 6.1 Création de HeroRestCrt
-  - Créer le package ```com.sp.rest``` dans ```src/test/java```
-  - Créer le fichier ```HeroRestCrt``` comme suit:
+- Créer un package ```rest``` dans ```com.sp```
+- dans ```com.sp.rest``` créer le fichier ```TestRestCrt```
 
 ```java
 package com.sp.rest;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mockito;
-import org.skyscreamer.jsonassert.JSONAssert;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.MediaType;
-import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.RequestBuilder;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import com.sp.model.Hero;
-import com.sp.service.HeroService;
-
-@RunWith(SpringRunner.class)
-@WebMvcTest(value = HeroRestCrt.class)
-public class HeroRestCrtTest {
+@RestController
+public class TestRestCrt {
 	
-	@Autowired
-	private MockMvc mockMvc;
-	
-	@MockBean
-	private HeroService hService;
-
-	Hero mockHero=new Hero(1, "jdoe", "strong", 100, "https//url.com");
-	
-	@Test
-	public void retrieveHero() throws Exception {
-		Mockito.when(
-				hService.getHero(Mockito.anyInt())
-				).thenReturn(mockHero);
-				
-
-		RequestBuilder requestBuilder = MockMvcRequestBuilders.get("/hero/50").accept(MediaType.APPLICATION_JSON);
-
-		MvcResult result = mockMvc.perform(requestBuilder).andReturn();
-
-		System.out.println(result.getResponse().getContentAsString());
-		String expectedResult="{\"id\":1,\"name\":\"jdoe\",\"superPowerName\":\"strong\",\"superPowerValue\":100,\"imgUrl\":\"https//url.com\"}";
-
-
-		JSONAssert.assertEquals(expectedResult, result.getResponse()
-				.getContentAsString(), false);
+	@RequestMapping("/hello")
+	public String sayHello() {
+		return "Hello Hero !!!";
 	}
 
 }
 ```
 - Explications:
-    - ```@RunWith(SpringRunner.class)``` : permet de lancer un contexte Springboot et de créer des objets spécifiquement pour le test. 
-    - ```@WebMvcTest(value = HeroRestCrt.class)``` : indique à Springboot de limiter le contexte de l'application pour ce test à l'objet ```HeroRestCrt```. Nous allons par la suite simuler le comportement des autres controlleurs utilisés (e.g ```HeroService```). Le contexte de l'application à simuler se trouvera dans l'objet ```MockMvc mockMvc```  (https://reflectoring.io/spring-boot-web-controller-test/) 
+  - ```@RestController``` : Annotation qui informe SpringBoot que la classe courante pourra déclencher des comportements en fonction d'urls appelées par un Web Browser.
+  - ```@RequestMapping("/hello")``` : informe que la fonction ```sayHello``` sera déclenchée lors de l'appel de l'url ```/hello```.
 
+#### 2.1.2 Test du RestController Simple 
+- Lancer votre application
+  - Clic droit sur le fichier ```SpAppHero```, ```Run AS``` -> ```Java Application```.
+- Votre application Springboot démarre. Le résultat suivant devrait apparaître dans la console de votre application:
+
+```
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+ :: Spring Boot ::        (v2.1.7.RELEASE)
+
+2020-04-21 14:41:34.774  INFO 18404 --- [           main] com.sp.SpAppHero                         : Starting SpAppHero on LAPTOP-GUASGB11 with PID 18404 (D:\Data\cpe_cours\ASI\ASI-1\addDocs\ws\asi1-springboot-tuto\step2\target\classes started by jsaraydaryan in D:\Data\cpe_cours\ASI\ASI-1\addDocs\ws\asi2-springboot-tuto\step1)
+2020-04-21 14:41:34.794  INFO 18404 --- [           main] com.sp.SpAppHero                         : No active profile set, falling back to default ...
+...
+...
+2020-04-21 14:41:47.423  INFO 18404 --- [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port(s): 8080 (http) with context path ''
+2020-04-21 14:41:47.459  INFO 18404 --- [           main] com.sp.SpAppHero
+```
+
+- Tester le RestController avec l'url suivante:
+```
+http://127.0.0.1:8080/hello
+```
+- Vous devez avoir le résultat suivant:
+```
+Hello Hero !!!
+```
+
+
+### 2.2 Création d'un RestController avancé
+
+#### 2.2.1 Création d'une Classe Modèle
+- Créer le package ```com.sp.model```
+- Créer le fichier ```Hero.java ``` dans ```com.sp.model``` comme suit:
+```java
+package com.sp.model;
+
+public class Hero {
+	private int id;
+	private String name;
+	private String superPowerName;
+	private int superPowerValue;
+	private String imgUrl;
+	
+	public Hero() {
+	}
+
+	public Hero(int id,String name, String superPowerName, int superPowerValue, String imgUrl) {
+		super();
+		this.id=id;
+		this.name = name;
+		this.superPowerName = superPowerName;
+		this.superPowerValue = superPowerValue;
+		this.imgUrl = imgUrl;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public String getSuperPowerName() {
+		return superPowerName;
+	}
+
+	public void setSuperPowerName(String superPowerName) {
+		this.superPowerName = superPowerName;
+	}
+
+	public int getSuperPowerValue() {
+		return superPowerValue;
+	}
+
+	public void setSuperPowerValue(int superPowerValue) {
+		this.superPowerValue = superPowerValue;
+	}
+
+	public String getImgUrl() {
+		return imgUrl;
+	}
+
+	public void setImgUrl(String imgUrl) {
+		this.imgUrl = imgUrl;
+	}
+	
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
+	}
+
+	@Override
+	public String toString() {
+		return "HERO ["+this.id+"]: name:"+this.name+", superPowerName:"+this.superPowerName+", superPowerValue:"+this.superPowerValue+" imgUrl:"+this.imgUrl;
+	}
+}
+
+```
+
+#### 2.2.2 Modification du Rest Controller 
+- Modifier le fichier ```TestRestCrt.java``` comme suit:
+
+```java
+package com.sp.rest;
+
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.sp.model.Hero;
+
+
+@RestController
+public class TestRestCrt {
+	
+	@RequestMapping("/hello")
+	public String sayHello() {
+		return "Hello Hero !!!";
+	}
+	
+	@RequestMapping(method=RequestMethod.POST,value="/addhero")
+	public void addHero(@RequestBody Hero hero) {
+		System.out.println(hero);
+	}
+	
+	@RequestMapping(method=RequestMethod.GET,value="/msg/{id1}/{id2}")
+	public String getMsg(@PathVariable String id1, @PathVariable String id2) {
+		String msg1=id1;
+		String msg2=id2;
+		return "Composed Message: msg1:"+msg1+"msg2:"+msg2;
+	}
+	
+	@RequestMapping(method=RequestMethod.GET,value="/parameters")
+	public String getInfoParam(@RequestParam String param1,@RequestParam String param2) {
+		return "Parameters: param1:"+param1+"param2:"+param2;
+	}
+}
+
+```
+- Explications:
+    ```java
+    ...
+    @RequestMapping(method=RequestMethod.POST,value="/addhero")
+	public void addHero(@RequestBody Hero hero) {
+		System.out.println(hero);
+	}
+    ...
+    ```
+    - ```method=RequestMethod.POST``` : définit la méthode HTTP autorisée sur cette URL.
+    - ```value="/hero"``` : définit l'URL qui déclenchera la fonction
+    - ```@RequestBody Hero hero ``` : permet de rechercher le contenu du body de la requête HTTP et le convertit en objet java
+
+    ```java
+    ...
+    	@RequestMapping(method=RequestMethod.GET,value="/msg/{id1}/{id2}")
+	public String getMsg(@PathVariable String id1, @PathVariable String id2) {
+		String msg1=id1;
+		String msg2=id2;
+		return "Composed Message: msg1:"+msg1+"msg2:"+msg2;
+	}
+    ...
+    ```
+    - ``` value="/msg/{id1}/{id2}" ``` : définit des variables dans l'URL qui seront définies par l'utilisateur lors de l'envoi de L'URL.
+    - ```@PathVariable String id1, @PathVariable String id2``` : récupère les variables de l'URL et les met à disposition de la fonction.
+    ```java
+    @RequestMapping(method=RequestMethod.GET,value="/parameters")
+	public String getInfoParam(@RequestParam String param1,@RequestParam String param2) {
+		return "Parameters: param1:"+param1+"param2:"+param2;
+	}
+    ```
+    - ```@RequestParam String param1,@RequestParam String param2``` : permet de récupérer les paramètres associés à la requête HTTP et de les rendre disponible à la fonction associée.
+
+#### 2.2.3 Test de l'application Rest Controller 
+- Lancer votre application
+  - clic droit sur le fichier ```SpAppHero```, ```Run AS``` -> ```Java Application```.
+- Tester:  Création d'un Hero:
+  - Création d'un Hero : à l'aide de PostMan envoyer la requête suivante:
+
+<img alt="img PostMan Add Hero" src="./images/PostManAddHero.jpg" width="500">
+  
+  - le résultat suivant doit s'afficher dans la console de l'application
+
+    ```
+    HERO [1]: name:jdoe, superPowerName:PowerFull, superPowerValue:500 imgUrl:http://fairedesgifs.free.fr/da/sh/superman/superman%20(5).gif
+    ```
+- Tester:  Variable dans l'URL:
+  - Appeler l'Url suivante dans un Web Browser:
+    ```
+    http://127.0.0.1:8080/msg/myPath1/myPath2
+    ```
+  - Le résultat obtenu:
+
+<img alt="img PostMan Add Hero" src="./images/ResultPathVariable.jpg" width="500">
+
+- Tester:  Paramètres dans la requête HTTP:
+  - Appeler l'Url suivante dans un Web Browser:
+    ```
+    http://127.0.0.1:8080/parameters?param1=value1&param2=value2
+    ```
+  - Le résultat obtenu:
+  
+<img alt="img PostMan Add Hero" src="./images/ResultParams.jpg" width="500">
+
+## 3 Persistance des données et Services
+- Springboot offre la possibilité de faire de l'injection de dépendance. Ainsi des instances de classe crées par le serveur pourront être utilisées dans d'autres classes
+
+### 3.1 Service Springboot
+- Springboot nous permet de créer des instances uniques de classes (Singleton) qui auront comme responsabilité d'effectuer le traitement métiers de l'application
+- Créer le package ```com.sp.service```
+- Créer le fichier ```HeroService.java``` dans le package ```com.sp.service``` comme suit:
   ```java
-  ...
-  	@Autowired
-	private MockMvc mockMvc;
-  ```
-    - Récupère le contexte de l'application à tester qui a été défini par ```@WebMvcTest```
+  package com.sp.service;
+    import org.springframework.stereotype.Service;
 
+    import com.sp.model.Hero;
+
+    @Service
+    public class HeroService {
+        
+        public void addHero(Hero h) {
+            System.out.println(h);
+        }
+        
+        public Hero getHero(int id) {
+            Hero h =new Hero(2, "Flash", "VeryFast", 20, "http://fairedesgifs.free.fr/da/sh/flash/flash-(4).gif");
+            return h;
+        }
+
+    }
+    ```
+
+- Explications:
+    - ```@Service``` : annotation permettant de créer un singleton de la classe courante et permettant l'injection de dépendances dans une autre classe.
+
+
+- Créer le fichier ```HeroRestCrt.java``` dans le package ```com.sp.rest``` comme suit:
   ```java
-  ...
-  @MockBean
-	private HeroService hService;
-  ...
+    package com.sp.rest;
+
+    import org.springframework.beans.factory.annotation.Autowired;
+    import org.springframework.web.bind.annotation.PathVariable;
+    import org.springframework.web.bind.annotation.RequestBody;
+    import org.springframework.web.bind.annotation.RequestMapping;
+    import org.springframework.web.bind.annotation.RequestMethod;
+    import org.springframework.web.bind.annotation.RestController;
+
+    import com.sp.model.Hero;
+    import com.sp.service.HeroService;
+
+    @RestController
+    public class HeroRestCrt {
+        @Autowired
+        HeroService hService;
+        
+        @RequestMapping(method=RequestMethod.POST,value="/hero")
+        public void addHero(@RequestBody Hero hero) {
+            hService.addHero(hero);
+        }
+        
+        @RequestMapping(method=RequestMethod.GET,value="/hero/{id}")
+        public Hero getHero(@PathVariable String id) {
+            Hero h=hService.getHero(Integer.valueOf(id));
+            return h;
+        }
+    }
   ```
-  - ``` @MockBean ``` permet de remplacer la ressource cible par une version "simulée" par Mockito mock. Nous pourrons ainsi définir le comportement attendu de cette ressource ciblée.
+  - Explications:
+    - ```@Autowired``` : annotation permettant d'injecter le service ```HeroService```. Cet object sera utilisé uniquement au moment de son appel (e.g ```hService.addHero(hero);```) 
 
-  ```java
-  Mockito.when(
-				hService.getHero(Mockito.anyInt())
-				).thenReturn(mockHero);
-  ```
-   - Redéfinit le comportement attendu par hService. Dans notre cas lors de l'appel de ```hService.getHero``` avec comme argument n'importe quel entier (```Mockito.anyInt()```), cette méthode va retourner toujours le même objet ```mockHero```.
+- Tester votre application:
+  - Lancer votre application
+    - Clic droit sur le fichier ```SpAppHero```, ```Run AS``` -> ```Java Application```.
+- Tester:  add User:
+  - A l'aide de Postman, effectuer la requête suivante:
 
-  ```java
-  ...
-      RequestBuilder requestBuilder = MockMvcRequestBuilders.get("/hero/50").accept(MediaType.APPLICATION_JSON);
-  ...
-  ```
-  - Prépare une requète Http de type ```get``` avec comme Url ```/hero/50``` et comme médiat type ```MediaType.APPLICATION_JSON``` à simuler.
+<img alt="img PostMan Add Hero Rest" src="./images/PostManAddHeroRest.jpg" width="500">
 
-  ```java
-  ...
-  MvcResult result = mockMvc.perform(requestBuilder).andReturn();
-  ...
-  ```
-  - Exécute la requète dans notre contexte d'application simulée (ici uniquement l'objet ```HeroRestCrt```) et récupère le résultat à cette requête.
+  - le résultat suivant doit s'afficher dans la console de l'application
 
-  ```java
-  	JSONAssert.assertEquals(expectedResult, result.getResponse()
-				.getContentAsString(), false);
-  ```
-  - Compare le contenu de la requête au résultat attendu (conversion automatique des string au format JSON)
+    ```
+    HERO [1]: name:jdoe, superPowerName:PowerFull, superPowerValue:500 imgUrl:http://fairedesgifs.free.fr/da/sh/superman/superman%20(5).gif
+    ```
+ - Tester:  get User:
+
+  - Appeler l'Url suivante dans un Web Browser:
+    ```
+    http://127.0.0.1:8080/hero/15
+    ```
+     - Le résultat obtenu:
+  
+<img alt="img PostMan Add Hero" src="./images/ResultGetHero.jpg" width="500">
+
+## 3.2 Persistance de données
+
+### 3.2.1 Entity
+- Afin de permettre de sauvegarder ```Hero``` dans la base de données ```H2```. Modifier le fichier ```Hero.java``` comme suit:
+
+```java
+package com.sp.model;
+
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+
+@Entity
+public class Hero {
+	@Id
+	@GeneratedValue
+	private Integer id;
+	private String name;
+	private String superPowerName;
+	private int superPowerValue;
+	private String imgUrl;
+	
+	public Hero() {
+	}
+
+	public Hero(int id,String name, String superPowerName, int superPowerValue, String imgUrl) {
+		super();
+		this.id=id;
+		this.name = name;
+		this.superPowerName = superPowerName;
+		this.superPowerValue = superPowerValue;
+		this.imgUrl = imgUrl;
+	}
+
+...
+```
+- Explications
+  - ```@Entity``` nous indique que cette classe est une classe persistante. Le service JPA va ainsi créer une table correspondante à cette classe (la table de la BD portera le nom de la classe par default)
+  - ```@Id``` indique à JPA que l'attribut ```private int id``` est la clé primaire de notre table
+  - ```@GeneratedValue``` indique à JPA  que l'attribut ```private int id``` sera auto-généré.
+  
+### 3.2.2 Repository
+- Créer le package ```com.sp.repository```
+- Créer le fichier ```HeroRepository.java``` dans ```com.sp.repository``` comme suit:
+```java
+package com.sp.repository;
+
+import java.util.List;
+import org.springframework.data.repository.CrudRepository;
+import com.sp.model.Hero;
+
+public interface HeroRepository extends CrudRepository<Hero, Integer> {
+
+	public List<Hero> findByName(String name);
+}
+```
+- Explications:
+    ```java
+    ...
+    public interface HeroRepository extends CrudRepository<Hero, Integer> {
+    ...
+    ```
+    - Springboot nous permet de créer un DAO (Data Access Object) automatiquement à partir de l'interface présentée ici. Cette interface précise que le futur DAO sera un CRUD (Create Read Update Delete) et portera sur l'objet ```Hero```qui a pour clé un ```Integer```. Springboot va alors se charger de créer un singleton DAO à partir de ce fichier avec les méthodes permettant d'ajouter, de mettre à jour, d'accéder et de supprimer des objets ```Hero```.
+    
+    ```java
+    ...
+    public List<Hero> findByName(String name);
+    ...
+    ```
+    - Ici on définit une méthode grace à une convention de nommmage ```findBy<attributeName>```. Springboot va alors créer une méthode associée qui effectuera une requête (e.g sql) permettant de récupérer tous les ```Hero``` qui possèdent le ```name``` égal au ```name``` passé en paramètre.
+
+### 3.2.3 Modification du service
+- Modifier le fichier ```HeroService``` comme suit:
+
+```java
+package com.sp.service;
+
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.sp.model.Hero;
+import com.sp.repository.HeroRepository;
+
+@Service
+public class HeroService {
+	@Autowired
+	HeroRepository hRepository;
+	public void addHero(Hero h) {
+		Hero createdHero=hRepository.save(h);
+		System.out.println(createdHero);
+	}
+	
+	public Hero getHero(int id) {
+		Optional<Hero> hOpt =hRepository.findById(id);
+		if (hOpt.isPresent()) {
+			return hOpt.get();
+		}else {
+			return null;
+		}
+	}
+
+}
+```
+- Explications:
+    ```java
+    ...
+    @Autowired
+	HeroRepository hRepository;
+    ...
+    ```
+    - Permet d'injecter l'objet ```HeroRepository``` créé par Springboot
+
+    ```java
+    ...
+    hRepository.save(h);
+	...
+    Optional<Hero> hOpt =hRepository.findById(id);
+    ...
+    ```
+    - ```HeroRepository``` possède des méthodes prédéfinies lui permettant de jouer son rôle de CRUD.
+
+### 3.2.4 Test de l'application
+- Tester votre application:
+  - Lancer votre application
+    - Clic droit sur le fichier ```SpAppHero```, ```Run AS``` -> ```Java Application```.
+
+  - A l'aide de Postman, effecuter la requête suivante:
+
+<img alt="img PostMan Add Hero Rest" src="./images/PostManAddHeroRest.jpg" width="500">
+
+  - Dans un WebBrowser appeler ensuite l'URL suivante avec l'id qui s'affiche dans la console de l'application:
+```
+127.0.0.1:8080/hero/1
+```
+ - Le résultat obtenu doit être le suivant:
+
+<img alt="img PostMan Add Hero Rest" src="./images/ResultGetHero2.jpg" width="500">
+  
+
+# 4 Changer la configuration par default du serveur Springboot
+- Dans ```src/main/resources``` créer le fichier ```application.properties```
+```yaml
+server.address=127.0.0.1
+server.port=8081
+
+## FOR EXTERNAL MYSQL DB
+#spring.jpa.hibernate.ddl-auto = validate
+#spring.jpa.hibernate.ddl-auto=create
+#spring.datasource.url=jdbc:mysql://127.0.0.1:3306/bd
+
+## PostgreSQL
+#spring.datasource.url=jdbc:postgresql://127.0.0.1:5432/bd
+#spring.datasource.username=mylogin
+#spring.datasource.password=mypwd
 
 
-### 6.2 Exécution de notre fonction de Test
-- Exécuter votre test en utilisant le Framework Junit sous Eclipse directement
-  - Clic droit sur le projet ```RUN AS```-> ``` JUNIT TEST```
-  - Le résultat suivant doit apparaite:
+
+## FOR EMBEDED DB
+spring.jpa.hibernate.ddl-auto=create
+
+```
+- Explications:
+  - ```server.address=127.0.0.1``` : permet de rédéfinir l'adresse de notre serveur
+  - ``` server.port=8081 ``` : permet de rédéfinir le port de notre serveur
+  - ```spring.jpa.hibernate.ddl-auto=create``` : permet de définir le comportement de notre application. Ici ```create``` indique à JPA que la base de données sera reconstruite à chaque démarrage de l'application (perte de données à chaque redémarrage). ```validate``` permet d'utiliser une base de données déjà créée.
+
+- Usage d'une base de données extérieure
+  - Dans le cas ou vous souhaitez utiliser une base de données extérieure (e.g Postgresql) vous devez
+    - Ajouter la dépendance du connecteur JDBC au pom.xml et commenter les connecteurs non utilisés.
+
+    ```xml
+    ...
+        <!-- <dependency> -->
+		<!-- <groupId>com.h2database</groupId> -->
+		<!-- <artifactId>h2</artifactId> -->
+		<!-- <scope>runtime</scope> -->
+		<!-- </dependency> -->
+
+		<dependency>
+		<groupId>org.postgresql</groupId>
+		<artifactId>postgresql</artifactId>
+		</dependency>
+    ...
+    ```
+    - Modifier le fichier ```application.properties``` pour renseigner les propriétés de la base de données cible
+
+    ```yaml
+        server.address=127.0.0.1
+        server.port=8080
+
+        ## PostgreSQL
+        spring.jpa.hibernate.ddl-auto=create
+        spring.datasource.url=jdbc:postgresql://127.0.0.1:5432/bd
+        spring.datasource.username=mylogin
+        spring.datasource.password=mypwd
+
+    ```
 
 
-<img alt="img Maven Test" src="./images/JunitExecution5.jpg
-" width="400">
-
-- Exécuter votre test en utilisant Maven
-  - Clic droit sur le projet ```RUN AS```-> ``` MAVEN TEST```

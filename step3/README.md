@@ -1,309 +1,505 @@
 **Author**: Jacques Saraydaryan, All rights reserved
-# Step 3: CI/CD pour une application SpringBoot
-Note tout le contenu de cette partie est disponible ici (https://gitlab.com/js-as1/asi1-springboot-cicd-example)
+# Step 3: Mise en place de Tests sur une application Springboot
 
 ## 1 Contexte
-Afin d'automatiser la mise en oeuvre de tests et la compilation de l'application, nous allons mettre en place sur chaîne d'intégration continue et de déploiement continue pour notre application Springboot.
-Git lab propose un gamme d'outils permettant la mise en place de processus automatiques pour l'intégration continue (e.g vérification de la syntaxe, exécution de tests unitaires, création de livrable...).
+Afin de mettre en place de la qualité logicielle, il est indispensable de pouvoir tester son application. Il existe plusieurs types de tests:
+- Tests Systèmes : testent l'ensemble de l'application sur des scénarios donnés
+- Tests d'Intégration: testent un sous-ensemble de fonctionnalité de l'application (e.g authentification d'un utilisateur)
+- Tests unitaires: testent une fonction d'une classe
 
-Une complète présentation de la CI/CD de Gitlab est disponible ici [https://docs.gitlab.com/ee/ci/](https://docs.gitlab.com/ee/ci/). 
-![GitlabCi-CD image]( https://docs.gitlab.com/ee/ci/introduction/img/gitlab_workflow_example_11_9.png)
-*Workflow Gitlab CI-CD*
-
-Pour mettre en place l'intégration continue dans un repository git lab, il suffit d'ajouter un fichier ```.gitlab-ci.yml``` à la racine du répository.
-Ce fichier va permettre de configurer tout le process automatique d'intégration continue.
-
-## 2 Présentation de  ```.gitlab-ci.yml```
-
-```.gitlab-ci.yml``` contient l'ensemble des instructions permettant la mise en oeuvre de pipeline d'intégration continue. Un ```pipeline``` est une suite d'opérations (```jobs```) qui va être réalisée automatiquement dès qu'un déclencheur est activé (e.g push sur la branch DEV, MASTER). Ces ```jobs``` peuvent être exécutés en parallèle et regroupés en ```stage``` (étapes regroupant plusieurs ```jobs```). Une complète présentation des ```pipelines``` et des ```stages``` est disponible ici [https://docs.gitlab.com/ee/ci/pipelines.html](https://docs.gitlab.com/ee/ci/pipelines.html).   
-
-
-## 3 Création d'un pipeline de compilation
-- Ici nous allons créer une intégration continue permettant de compiler automatiquement notre code.
-
-- Créer un fichier ```.gitlab-ci.yml``` à la racine de votre projet comme suit:
-
-
-```yaml
-# image docker (container virtuel) pour executer les jobs (e.g effectuer le build de l'application)
-image: "maven:3-jdk-8"
-
-# commandes à executer sur le container virtuel (e.g ajout d'outils non dispo sur l'image de base)
-before_script:
-  - echo "I am a script executed before"
-
-# definition de l'ordre d'execution des jobs 
-# (e.g tous les jobs qui ont 'state:build' seront executés en premiers, puis tous les jobs de 'state:test' etc..)
-stages:
-  - build
-
-# definition d'un job, à quelle étape il sera executé (stage), le script a executé (e.g mvn compile)
-job_build:
-  stage: build
-  script:
-    - mvn compile
-    
-```
-- Explications
-  - ```image: "maven:3-jdk-8"``` permet de préciser quelle image docker sera utilisée pour exécuter les différents jobs. Note il est possible de spécifier des images spécifiques par jobs également. Ici l'image docker utiliser contiendra maven et un jdk-8.
-  ```yaml
-  ...
-  before_script:
-  - echo "I am a script executed before"
-  ...
-  ```
-  - Permet d'exécuter des scripts sur le container docker qui sera utilisé avant la réalisation des jobs (e.g sudo apt-get install nano)
-
-  ```yaml
-  ...
-  stages:
-  - build
-  ...
-  ```
-  - Définit les étapes à réaliser dans ce pipeline. ici l'étape ```build``` sera exécutée en première. Note le nom de chaque étape est libre.
-
-  ```yaml
-  job_build:
-  stage: build
-  script:
-    - mvn compile
-  ```
-  - Précise un job. Ici ce job ```job_build```, sera exécuté à l'étape indiquée par ```stage```. Dans notre cas, le job ```job_build``` s'exécutera à l'étape ```build```. ```script``` permet de préciser l'ensemble des commandes à exécuter durant cette étape. Ici nous allons lancer la commande de compilation d'un projet maven ``` mvn compile ```
-
-- Commiter votre modification et regarder le résultat de CI/CD dans l'interface web de gitlab.
-
-<img alt="img result compile pipeline" src="./images/result-firstPipeLine.jpg
+<img alt="img Test" src="https://blog.octo.com/wp-content/uploads/2018/06/pyramide_globale.png
 " width="600">
 
-## 4 Ajout d'une étape d'exécution de tests automatiques
-- Modifier le fichier ```.gitlab-ci.yml``` comme suit:
+Les tests unitaires testent de petites portions de fonctionnalités de façon indépendante. Ces tests nombreux permettent de vérifier que nos modifications n'ont pas altéré le comportement d'autres fonctionnalités dans l'application. Ils vont permettre de tester la non-régression de notre application.
 
-```yaml
+Dans ce tuto., nous allons mettre en oeuvre des tests unitaires et d'intégration dans une application SpringBoot.
+
+## 2 Configuration du projet
+- Vérifier que vous avez bien réalisé la [step2](../step2/README.md), nous allons repartir sur la base du projet créé lors de cette étape.
+- Dans le fichier ```pom.xml``` vérifier que les éléments suivant sont présents:
+
+```xml
 ...
-stages:
-  - build
-  - test
+    <dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+	</dependency>
 ...
-# definition un nouveau job
-job_test:
-  stage: test
-  script:
-    - mvn test
-...
+
+```
+- Cette dépendance va permettre de récupérer l'ensemble des outils pour les tests (e.g JUnit, Hamcrest and Mockito )
+
+- Maven nous propose une structure permettant d'isoler les tests dans des packages séparés. En effet, lors de la production de notre archive finale, il sera plus facile de ne pas intégrer les tests à la version finales de notre application
+
+
+<img alt="img Maven Test" src="./images/MavenProjectStructure.jpg
+" width="300">
+
+## 3 Création de tests unitaires simples
+Dans cette section nous allons créer des tests unitaires sur ```Hero.java```. Nous allons tester respectivement la création d'un object avec des paramètres ainsi que l'affichage de cet objet.
+
+### 3.1 Création de HeroTest
+  - Créer le package ```com.sp.model``` dans ```src/test/java```
+  - Créer le fichier ```HeroTest.java``` comme suit:
+
+```java
+package com.sp.model;
+
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+
+public class HeroTest {
+	private List<String> stringList;
+	private List<Integer> intList;
+
+	@BeforeEach
+	public void setUp() {
+		System.out.println("[BEFORE TEST] -- Add Hero to test");
+		stringList = new ArrayList<String>();
+		intList = new ArrayList<Integer>();
+		stringList.add("normalString1");
+		stringList.add("normalString2");
+		stringList.add(";:!;!::!;;<>");
+		intList.add(5);
+		intList.add(500);
+		intList.add(-1);
+	}
+
+	@AfterEach
+	public void tearDown() {
+		System.out.println("[AFTER TEST] -- CLEAN hero list");
+		stringList = null;
+		intList = null;
+	}
+
+	@Test
+	public void createHero() {
+		for(String msg:stringList) {
+			for(String msg2:stringList) {
+				for(String msg3:stringList) {
+					for(Integer msg4:intList) {
+						Hero h=new Hero(msg4, msg, msg2, msg4, msg3);
+						System.out.println("msg:"+msg+", msg2:"+msg2+", msg3:"+msg3+", msg4:"+msg4);
+						assertTrue(h.getId().intValue() == msg4.intValue());
+						assertTrue(h.getName() == msg);
+						assertTrue(h.getSuperPowerName() == msg2);
+						assertTrue(h.getSuperPowerValue() == msg4);
+						assertTrue(h.getImgUrl() == msg3);
+					}	
+				}	
+			}
+		}
+
+	}
+	
+	@Test
+	public void displayHero() {
+		Hero h=new Hero(1,"jdoe", "strong", 100, "https//url.com");
+		String expectedResult="HERO [1]: name:jdoe, superPowerName:strong, superPowerValue:100 imgUrl:https//url.com";
+		assertTrue(h.toString().equals(expectedResult));
+		
+	}
+
+}
 ```
 - Explications:
-  ```yaml
-  ...
-  stages:
-    - build
-    - test
-  ...
+  ```java
+    ...
+    @BeforeEach
+	public void setUp() {
+        ...
   ```
-  - Ajout d'une étape ```test``` à notre pipeline
-  ```yaml
-  ...
-  job_test:
-  stage: test
-  script:
-    - mvn test
-  ...
+  - L'annotation ```@BeforeEach``` permet d'exécuter une fonction ```AVANT``` chaque test
+  ```java
+    ...
+	@AfterEach
+	public void tearDown() {
+        ...
   ```
-  - création d'un nouveau job ```job_test``` qui s'exécutera à l'étape ```test```.
+  - L'annotation ```@AfterEach``` permet d'exécuter une fonction ```APRES``` chaque test
+  ```java
+    ...
+	@Test
+	public void createHero() {
+        ...
+    }
+    @Test
+	public void displayHero() {
+        ...
+    }
+  ```
+    - L'annotation ```@Test``` permet d'indiquer au Framework de tests (JUNIT 5  Jupiter) que la méthode est une méthode de test
 
-- Commiter votre modification et regarder le résultat de CI/CD dans l'interface web de gitlab.
+### 3.2 Exécution de notre fonction de Test
+- Exécuter votre test en utilisant le Framework Junit sous Eclipse directement
+  - Clic droit sur le projet ```RUN AS```-> ``` JUNIT TEST```
+  - Le résultat suivant doit apparaite:
 
-## 5 Ajout d'une étape de package et récupération de la version compilée
-- Modifier le fichier ```.gitlab-ci.yml``` comme suit:
-```yaml
+
+<img alt="img Maven Test" src="./images/JunitExecution1.jpg
+" width="400">
+
+- Exécuter votre test en utilisant Maven
+  - Clic droit sur le projet ```RUN AS```-> ``` MAVEN TEST```
+
+   - Le résultat suivant doit apparaite à la console:
+
+```
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] -----------------< com.tuto.springboot:SPWebAppStep3 >------------------
+[INFO] Building SPWebApp2 0.0.1-SNAPSHOT
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
 ...
-stages:
-  - build
-  - test
-  - package
+[INFO] 
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+[INFO] Running com.sp.model.HeroTest
+[BEFORE TEST] -- Add Hero to test
+msg:normalString1, msg2:normalString1, msg3:normalString1, msg4:5
+msg:normalString1, msg2:normalString1, msg3:normalString1, msg4:500
 ...
-# definition un nouveau job
-job_package:
-  stage: package
-  script:
-    - mvn package
-  artifacts:
-    paths:
-    - target/*.jar
-    expire_in: 1 week
+[AFTER TEST] -- CLEAN hero list
+[BEFORE TEST] -- Add Hero to test
+[AFTER TEST] -- CLEAN hero list
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.257 s - in com.sp.model.HeroTest
+[INFO] 
+[INFO] Results:
+[INFO] 
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0
+[INFO] 
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  4.087 s
+[INFO] Finished at: 2020-04-22T11:28:20+02:00
+[INFO] ------------------------------------------------------------------------
+```
+
+## 4 Création de tests sur le Repository
+Dans cette Section nous allons créer des tests pour ```HeroRepository.java```. Pour vérifier le fonctionnement du contrôleur nous aurons besoin de simuler une base de données embarquée
+
+### 4.1 Création de HeroRepositoryTest
+  - Créer le package ```com.sp.repository``` dans ```src/test/java```
+  - Créer le fichier ```HeroRepositoryTest``` comme suit:
+
+```java
+    package com.sp.repository;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+
+import com.sp.model.Hero;
+
+@ExtendWith(SpringExtension.class)
+@DataJpaTest
+public class HeroRepositoryTest {
+
+	@Autowired
+	HeroRepository hrepo;
+
+	@BeforeEach
+	public void setUp() {
+		hrepo.save(new Hero(1, "jdoe", "strong", 100, "https//url.com"));
+	}
+
+	@AfterEach
+	public void cleanUp() {
+		hrepo.deleteAll();
+	}
+
+	@Test
+	public void saveHero() {
+		hrepo.save(new Hero(1, "test", "testPower", 1, "https//test_url.com"));
+		assertTrue(true);
+	}
+
+	@Test
+	public void saveAndGetHero() {
+		hrepo.deleteAll();
+		hrepo.save(new Hero(2, "test1", "testPower1", 1, "https//test1_url.com"));
+		List<Hero> heroList = new ArrayList<>();
+		hrepo.findAll().forEach(heroList::add);
+		assertTrue(heroList.size() == 1);
+		assertTrue(heroList.get(0).getSuperPowerName().equals("testPower1"));
+		assertTrue(heroList.get(0).getName().equals("test1"));
+		assertTrue(heroList.get(0).getImgUrl().equals("https//test1_url.com"));
+	}
+
+	@Test
+	public void getHero() {
+		List<Hero> heroList = hrepo.findByName("jdoe");
+		assertTrue(heroList.size() == 1);
+		assertTrue(heroList.get(0).getName().equals("jdoe"));
+		assertTrue(heroList.get(0).getSuperPowerName().equals("strong"));
+		assertTrue(heroList.get(0).getImgUrl().equals("https//url.com"));
+	}
+
+	@Test
+	public void findByName() {
+		hrepo.save(new Hero(1, "test1", "testPower1", 1, "https//test1_url.com"));
+		hrepo.save(new Hero(2, "test2", "testPower2", 2, "https//test2_url.com"));
+		hrepo.save(new Hero(3, "test2", "testPower2", 2, "https//test2_url.com"));
+		hrepo.save(new Hero(4, "test2", "testPower2", 2, "https//test2_url.com"));
+		List<Hero> heroList = new ArrayList<>();
+		hrepo.findByName("test2").forEach(heroList::add);
+		assertTrue(heroList.size() == 3);
+	}
+
+}
 ```
 - Explications:
-  ```yaml
-  ...
-  stages:
-    - build
-    - test
-    - package
-  ...
-  ```
-  - Ajout d'une étape ```package``` à notre pipeline
-  ```yaml
-  ...
-  job_package:
-    stage: package
-    script:
-      - mvn package
-    artifacts:
-      paths:
-      - target/*.jar
-      expire_in: 1 week
-  ...
-  ```
-  - Création d'un nouveau job ```job_package``` qui s'exécutera à l'étape ```package```. Ici l'élément ```artifacts``` permet de préciser les objets à récupérer et à rendre disponible au téléchargement sur l'interface web de Gitlab. ```paths``` indique les éléments à récupérer en utilisant les expréssions régulières. Ici tous les fichiers ```.jar``` du répertoire ```targert``` seront récupérés. La balise ```expire_in``` détermine au bout de combien de temps les fichiers vont être disponibles au téléchargement sur l'interface web de Gitlab.
+  -    ``` @ExtendWith(SpringExtension.class)``` permet de lancer un contexte Springboot et de créer des objets spécifiquement pour le test. Ici nous permet d'accéder à ```HeroRepository hrepo;```
+  -   ``` @DataJpaTest ``` permet de créer une base de données temporaire pour l'exécution du test
+    ```java
+        @Autowired
+        HeroRepository hrepo;
+    ```
+  - Il est possible d'injecter un ```HeroRepository``` grâce à ``` @ExtendWith(SpringExtension.class)``` et au contexte Springboot créé pour le test.
+
+### 4.2 Exécution de notre fonction de Test
+- Exécuter votre test en utilisant le Framework Junit sous Eclipse directement
+  - Clic droit sur le projet ```RUN AS```-> ``` JUNIT TEST```
+  - Le résultat suivant doit apparaite:
 
 
-## 6 Mise en place du déploiement continu
-- Le déploiement continu va permettre de mettre en place sur un serveur la dernière version de notre application. Pour cela nous allons utiliser les serveurs d'```Heroku```.
+<img alt="img Maven Test" src="./images/JunitExecution2.jpg
+" width="400">
 
-La suite de ce tuto suit les recommandations indiquées ici (https://medium.com/swlh/how-do-i-deploy-my-code-to-heroku-using-gitlab-ci-cd-6a232b6be2e4)
+- Exécuter votre test en utilisant Maven
+  - Clic droit sur le projet ```RUN AS```-> ``` MAVEN TEST```
 
-### 6.1  Configurer de Heroku
 
-- Créer un compte chez HEROKU https://dashboard.heroku.com/
-- Générer une clé d'API dans ```account settings```> ```Real```
+## 5 Création de tests sur le Service
+Dans cette Section nous allons créer des tests pour ```HeroService.java```. Pour vérifier le fonctionnement du contrôleur nous aurons besoin de simuler le comportement d'autres controleurs (e.g ```HeroRepository```).
 
-![Heroku Api Key](https://miro.medium.com/max/1400/1*XDHTONpx11tznVEpMi3wRA.png)
+### 5.1 Création de HeroServiceTest
+  - Créer le package ```com.sp.service``` dans ```src/test/java```
+  - Créer le fichier ```HeroService``` comme suit:
+  
+```java
+package com.sp.service;
 
-- Créer une nouvelle application 
-![Heroku create App1](https://miro.medium.com/max/2000/1*w23kah7lvKDazyqzoQs2PA.png)
-![Heroku create App2](https://miro.medium.com/max/2000/1*PVniAX6WPTDtaaMxE-LhJA.png)
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-### 6.2 Configurer de Gilab
-- Dans votre projet Gilab ouvir le menu ```settings > CI/CD```
-- Vérifier que les ```runner``` Gitlab sont activés
+import java.util.Optional;
 
-![Gitlab Runner](https://miro.medium.com/max/2000/1*C3QSrYdIhHT3BcEar8sefw.png)
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-- Aller dans la section ```Variables``` et ajouter les 3 variables suivantes:
-  - HEROKU_API_KEY : clé de votre Api Heroku
-  - HEROKU_APP_PRODUCTION : nom de votre app en stage
-  - HEROKU_APP_STAGING : nom de votre app en prod
+import com.sp.model.Hero;
+import com.sp.repository.HeroRepository;
 
-![Gilab variables](https://miro.medium.com/max/2000/1*T3_zNAc7rjTEAFg0IQXppA.png)
-
-### 6.3 Modification du pipeline
-- A la racine de votre projet Gitlab, modifier le fichier ```.gitlab-ci.yml``` comme suit:
-
-```yaml
-...
-stages:
-  - build
-  - test
-  - package
-  - deploy
-
-...
-
-# definition un nouveau job pour le déploiement continu
-job_deploy:
-  stage: deploy
-  image: ruby:2.4
-  script:
-    - apt-get update -qy
-    - apt-get install -y ruby-dev
-    - gem install dpl
-    - dpl --provider=heroku --app=$HEROKU_APP_PRODUCTION --api-key=$HEROKU_API_KEY
-    
-  only:
-    - master
+@ExtendWith(SpringExtension.class)
+@WebMvcTest(value = HeroService.class)
+public class HeroServiceTest {
+		
+	@MockBean
+	private HeroRepository hRepo;
+	
+	@Autowired
+	private HeroService hService;
+	
+	Hero tmpHero=new Hero(1, "jdoe", "strong", 100, "https//url.com");
+	
+	@Test
+	public void getHero() {
+		Mockito.when(
+				hRepo.findById(Mockito.any())
+				).thenReturn(Optional.ofNullable(tmpHero));
+		Hero heroInfo=hService.getHero(45);
+		assertTrue(heroInfo.toString().equals(tmpHero.toString()));
+	}
+}
 ```
-- Explications
-  ```yaml
-  ...
-  stages:
-    - build
-    - test
-    - package
-    - deploy
-  ...
-  ```
-  - Ajout d'une étape ```deploy``` à notre pipeline
-  ```yaml
-  ...
-  job_deploy:
-    stage: deploy
-    image: ruby:2.4
-    script:
-      - apt-get update -qy
-      - apt-get install -y ruby-dev
-      - gem install dpl
-      - dpl --provider=heroku --app=$HEROKU_APP_PRODUCTION --api-key=$HEROKU_API_KEY
-      
-    only:
-      - master
-  ...
-  ```
-    - Création d'un nouveau job ```job_deploy``` qui s'exécutera à l'étape ```deploy```. Ici la balise ```script``` définit l'ensemble des scripts a exécutés lors de cette étape. Les outils nécessaires au déploiement seront installés puis la commande ``` dpl --provider=heroku --app=$HEROKU_APP_PRODUCTION ``` permet de déployer notre application sur les serveurs distants d'Heroku.
-    - ```only``` spécifie sur quel branche le job sera autorisé. Dans notre cas, le job ```job_deploy``` sera exécuté uniquement sur la branche master.
+  - Explications:
+    - ```@ExtendWith(SpringExtension.class)``` : permet de lancer un contexte Springboot et des créer des objets spécifiquement pour le test. 
+    - ```@WebMvcTest(value = HeroService.class)``` : indique à Springboot de limiter le contexte de l'application pour ce test à l'objet ```HeroService```. 
+    ```java
+    ...
+    	@Autowired
+	    private HeroService hService;
+    ...
+    ```
+    - Injection du service ```HeroService```. Il s'agit du seul object, ```Bean```, accessible dans ce contexte de test (défini dans ```@WebMvcTest(value = HeroService.class)``` ).
+    ```java
+    ...
+      @MockBean
+	    private HeroRepository hRepo;
+    ...
+    ```
+    - ``` @MockBean ``` permet de remplacer la ressource cible par une version "simulée" par Mockito mock. Nous pourrons ainsi définir le comportement attendu de cette ressource ciblée.
+
+    ```java 
+    ...
+    Mockito.when(
+				hRepo.findById(Mockito.any())
+				).thenReturn(Optional.ofNullable(tmpHero));
+    ...
+    ```
+    - Redéfini le comportement attendu par ```hRepo```. Dans notre cas, lors de l'appel de ```hRepo.findById``` avec comme argument n'importe quel objet (```Mockito.any()```), cette méthode va retourner toujours le même objet ```Optional.ofNullable(tmpHero)```.
+
+    ```java
+    ...
+    assertTrue(heroInfo.toString().equals(tmpHero.toString()));
+    ...
+    ```
+    - Test si le retour de ```hService.getHero``` correspond à la valeur attendue.
+
+### 5.2 Exécution de notre fonction de Test
+- Exécuter votre test en utilisant le Framework Junit sous Eclipse directement
+  - Clic droit sur le projet ```RUN AS```-> ``` JUNIT TEST```
+  - Le résultat suivant doit apparaite:
 
 
-### 6.4 Fichier complet final ```.gitlab-ci.yml```
+<img alt="img Maven Test" src="./images/JunitExecution4.jpg
+" width="400">
 
-```yaml
-# image docker (container virtuel) pour executer les jobs (e.g effectuer le build de l'application)
-image: "maven:3-jdk-8"
+- Exécuter votre test en utilisant Maven
+  - Clic droit sur le projet ```RUN AS```-> ``` MAVEN TEST```
 
-# commandes à executer sur le container virtuel (e.g ajout d'outils non dispo sur l'image de base)
-before_script:
-  - echo "I am a script executed before"
 
-# definition de l'ordre d'execution des jobs 
-# (e.g tous les jobs qui ont 'state:build' seront executés en premiers, puis tous les jobs de 'state:test' etc..)
-stages:
-  - build
-  - test
-  - package
-  - deploy
 
-# definition d'un job, à quelle étape il sera executé (stage), le script a executé (e.g mvn compile)
-job_build:
-  stage: build
-  script:
-   - mvn compile
-    
-# definition un nouveau job
-job_test:
-  stage: test
-  script:
-    - mvn test
+## 6 Création de tests sur le RestController
+Dans cette Section nous allons créer des tests pour  ```HeroRestCrt.java```. Pour vérifier le fonctionnement du contrôleur nous aurons besoin de simuler l'envoi de requête HTTP.
 
-# definition un nouveau job
-job_package:
-  stage: package
-  script:
-    - mvn package
-  # definition d'un livrable issue de la compilation (et des autres opérations demandées), disponible au téléchargement
-  artifacts:
-    paths:
-    - ./target/*.jar
-    expire_in: 1 week
+### 6.1 Création de HeroRestCrt
+  - Créer le package ```com.sp.rest``` dans ```src/test/java```
+  - Créer le fichier ```HeroRestCrt``` comme suit:
 
-# definition un nouveau job pour le déploiement continu, ici heroku va détecter automatiquement le type de projet
-# (grave au pom.xml à la racine) et lancer l'application au démarrage
-job_deploy:
-  stage: deploy
-  image: ruby:2.4
-  script:
-    - apt-get update -qy
-    - apt-get install -y ruby-dev
-    - gem install dpl
-    - dpl --provider=heroku --app=$HEROKU_APP_PRODUCTION --api-key=$HEROKU_API_KEY
-  only:
-    - master
+```java
+package com.sp.rest;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mockito;
+import org.skyscreamer.jsonassert.JSONAssert;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.RequestBuilder;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+
+import com.sp.model.Hero;
+import com.sp.service.HeroService;
+
+@ExtendWith(SpringExtension.class)
+@WebMvcTest(value = HeroRestCrt.class)
+public class HeroRestCrtTest {
+	
+	@Autowired
+	private MockMvc mockMvc;
+	
+	@MockBean
+	private HeroService hService;
+
+	Hero mockHero=new Hero(1, "jdoe", "strong", 100, "https//url.com");
+	
+	@Test
+	public void retrieveHero() throws Exception {
+		Mockito.when(
+				hService.getHero(Mockito.anyInt())
+				).thenReturn(mockHero);
+				
+
+		RequestBuilder requestBuilder = MockMvcRequestBuilders.get("/hero/50").accept(MediaType.APPLICATION_JSON);
+
+		MvcResult result = mockMvc.perform(requestBuilder).andReturn();
+
+		System.out.println(result.getResponse().getContentAsString());
+		String expectedResult="{\"id\":1,\"name\":\"jdoe\",\"superPowerName\":\"strong\",\"superPowerValue\":100,\"imgUrl\":\"https//url.com\"}";
+
+
+		JSONAssert.assertEquals(expectedResult, result.getResponse()
+				.getContentAsString(), false);
+	}
+
+}
+
 ```
+- Explications:
+    - ```@ExtendWith(SpringExtension.class)``` : permet de lancer un contexte Springboot et de créer des objets spécifiquement pour le test. 
+    - ```@WebMvcTest(value = HeroRestCrt.class)``` : indique à Springboot de limiter le contexte de l'application pour ce test à l'objet ```HeroRestCrt```. Nous allons par la suite simuler le comportement des autres controlleurs utilisés (e.g ```HeroService```). Le contexte de l'application à simuler se trouvera dans l'objet ```MockMvc mockMvc```  (https://reflectoring.io/spring-boot-web-controller-test/) 
 
-### 6.5 Test du déploiement
-- Commiter et pusher vos changements sur la branche master
-- Vérifier que les étapes du déploiement ont bien été réalisées.
+  ```java
+  ...
+  	@Autowired
+	private MockMvc mockMvc;
+  ```
+    - Récupère le contexte de l'application à tester qui a été défini par ```@WebMvcTest```
 
-<img alt="img pipeline final result" src="./images/jobs-list-deploy.jpg
-" width="600">
+  ```java
+  ...
+  @MockBean
+	private HeroService hService;
+  ...
+  ```
+  - ``` @MockBean ``` permet de remplacer la ressource cible par une version "simulée" par Mockito mock. Nous pourrons ainsi définir le comportement attendu de cette ressource ciblée.
+
+  ```java
+  Mockito.when(
+				hService.getHero(Mockito.anyInt())
+				).thenReturn(mockHero);
+  ```
+   - Redéfinit le comportement attendu par hService. Dans notre cas lors de l'appel de ```hService.getHero``` avec comme argument n'importe quel entier (```Mockito.anyInt()```), cette méthode va retourner toujours le même objet ```mockHero```.
+
+  ```java
+  ...
+      RequestBuilder requestBuilder = MockMvcRequestBuilders.get("/hero/50").accept(MediaType.APPLICATION_JSON);
+  ...
+  ```
+  - Prépare une requète Http de type ```get``` avec comme Url ```/hero/50``` et comme médiat type ```MediaType.APPLICATION_JSON``` à simuler.
+
+  ```java
+  ...
+  MvcResult result = mockMvc.perform(requestBuilder).andReturn();
+  ...
+  ```
+  - Exécute la requète dans notre contexte d'application simulée (ici uniquement l'objet ```HeroRestCrt```) et récupère le résultat à cette requête.
+
+  ```java
+  	JSONAssert.assertEquals(expectedResult, result.getResponse()
+				.getContentAsString(), false);
+  ```
+  - Compare le contenu de la requête au résultat attendu (conversion automatique des string au format JSON)
 
 
-- Vérifier sur le lien Heroku de votre application que votre version commiter sur master a bien été déployée sur votre instance Heroku 
+### 6.2 Exécution de notre fonction de Test
+- Exécuter votre test en utilisant le Framework Junit sous Eclipse directement
+  - Clic droit sur le projet ```RUN AS```-> ``` JUNIT TEST```
+  - Le résultat suivant doit apparaite:
 
-<img alt="img pipeline result deploy" src="./images/deployResult.jpg" width="300">
+
+<img alt="img Maven Test" src="./images/JunitExecution5.jpg
+" width="400">
+
+- Exécuter votre test en utilisant Maven
+  - Clic droit sur le projet ```RUN AS```-> ``` MAVEN TEST```
