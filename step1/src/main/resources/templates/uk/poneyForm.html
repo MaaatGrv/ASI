@@ -18,23 +18,9 @@
 </head>
 <body>
 
-	<nav class="uk-navbar-container" uk-navbar>
-		<div class="uk-navbar-left">
-
-			<ul class="uk-navbar-nav">
-				<li class="uk-active"><a href="/uk"><span
-						uk-icon="icon: home; ratio: 1"></span> Hello</a></li>
-				<li><a href="#">Actions</a>
-					<div class="uk-navbar-dropdown">
-						<ul class="uk-nav uk-navbar-dropdown-nav">
-							<li><a href="/uk/view">Display</a></li>
-							<li><a href="/uk/addPoney">Add</a></li>
-							<li><a href="/uk/list">List</a></li>
-						</ul>
-					</div></li>
-			</ul>
-		</div>
-	</nav>
+	<div th:replace="uk/fragments/header :: header">
+		<h1> THIS IS A DEFAULT HEADER</h1>
+	</div>
 
 	<form th:action="@{/uk/addPoney}"
          th:object="${poneyForm}" method="POST">
