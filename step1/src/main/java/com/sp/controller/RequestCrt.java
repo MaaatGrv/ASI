@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import com.sp.model.Poney;
-import com.sp.model.PoneyForm;
+import com.sp.model.PoneyFormDTO;
 
 @Controller // AND NOT @RestController
 public class RequestCrt {
@@ -50,25 +50,25 @@ public class RequestCrt {
 	
 	@RequestMapping(value = { "/addPoney"}, method = RequestMethod.GET)
 	public String addponey(Model model) {
-		PoneyForm poneyForm = new PoneyForm();
+		PoneyFormDTO poneyForm = new PoneyFormDTO();
 		model.addAttribute("poneyForm", poneyForm);
 		return "poneyForm";
 	}
 	
 	
 	@RequestMapping(value = { "/addPoney"}, method = RequestMethod.POST)
-	public String addponey(Model model, @ModelAttribute("poneyForm") PoneyForm poneyForm) {
+	public String addponey(Model model, @ModelAttribute("poneyForm") PoneyFormDTO poneyForm) {
 		Poney p=poneyDao.addPoney(poneyForm.getName(),poneyForm.getColor(),poneyForm.getSuperPower(),poneyForm.getImgUrl());
 		model.addAttribute("myPoney",p );
 		return "poneyView";
 	}
 	
 	//------------------------------------------------------------------------------------------- //
-	//------------------------------------------ UIKIT ------------------------------------------ //
+	//------------------------------------------ UIKIT ROUTES------------------------------------ //
 	//------------------------------------------------------------------------------------------- //
 
 	@RequestMapping(value = { "/uk/addPoney"}, method = RequestMethod.POST)
-	public String addponeyUk(Model model, @ModelAttribute("poneyForm") PoneyForm poneyForm) {
+	public String addponeyUk(Model model, @ModelAttribute("poneyForm") PoneyFormDTO poneyForm) {
 		Poney p=poneyDao.addPoney(poneyForm.getName(),poneyForm.getColor(),poneyForm.getSuperPower(),poneyForm.getImgUrl());
 		model.addAttribute("myPoney",p );
 		return "uk/poneyView";
@@ -76,7 +76,7 @@ public class RequestCrt {
 	
 	@RequestMapping(value = { "/uk/addPoney"}, method = RequestMethod.GET)
 	public String addponeyUk(Model model) {
-		PoneyForm poneyForm = new PoneyForm();
+		PoneyFormDTO poneyForm = new PoneyFormDTO();
 		model.addAttribute("poneyForm", poneyForm);
 		return "uk/poneyForm";
 	}
@@ -105,41 +105,5 @@ public class RequestCrt {
 
 		return "uk/index";
 	}
-
-//	@RequestMapping(value = { "/personList" }, method = RequestMethod.GET)
-//	public String personList(Model model) {
-//
-//		model.addAttribute("persons", persons);
-//
-//		return "personList";
-//	}
-//
-//	@RequestMapping(value = { "/addPerson" }, method = RequestMethod.GET)
-//	public String showAddPersonPage(Model model) {
-//
-//		PersonForm personForm = new PersonForm();
-//		model.addAttribute("personForm", personForm);
-//
-//		return "addPerson";
-//	}
-//
-//	@RequestMapping(value = { "/addPerson" }, method = RequestMethod.POST)
-//	public String savePerson(Model model, //
-//			@ModelAttribute("personForm") PersonForm personForm) {
-//
-//		String firstName = personForm.getFirstName();
-//		String lastName = personForm.getLastName();
-//
-//		if (firstName != null && firstName.length() > 0 //
-//				&& lastName != null && lastName.length() > 0) {
-//			Person newPerson = new Person(firstName, lastName);
-//			persons.add(newPerson);
-//
-//			return "redirect:/personList";
-//		}
-//
-//		model.addAttribute("errorMessage", errorMessage);
-//		return "addPerson";
-//	}
 
 }

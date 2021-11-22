@@ -45,33 +45,6 @@
 		</fieldset>
 	</form>
 
-
-
-
-
-	<div class="uk-margin uk-padding">
-
-		<div class="uk-child-width-expand@s uk-text-center" uk-grid>
-			<div th:each="poney : ${poneyList}">
-				<div class="uk-card uk-card-default">
-					<div class="uk-card-media-top">
-						<img th:src="${poney.imgUrl}" alt="">
-					</div>
-					<div class="uk-card-body">
-						<h3 class="uk-card-title" th:utext="${poney.name}">...</h3>
-						<div th:style="'background-color:'+${poney.color}">
-							<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit,
-								sed do eiusmod tempor incididunt.</p>
-						</div>
-						<h5 th:text="'Color:  '+${poney.color}">...</h5>
-						<h5 th:text="'SuperPower:  '+${poney.superPower}">...</h5>
-					</div>
-				</div>
-			</div>
-		</div>
-
-	</div>
-
 </body>
 
 </html>

@@ -1,6 +1,6 @@
 package com.sp.model;
 
-public class PoneyForm  {
+public class PoneyFormDTO  {
 
 	private String color;
 	private String superPower;
@@ -13,13 +13,13 @@ public class PoneyForm  {
 	public void setImgUrl(String imgUrl) {
 		this.imgUrl = imgUrl;
 	}
-	public PoneyForm() {
+	public PoneyFormDTO() {
 		this.color = "";
 		this.superPower = "";
 		this.name = "";
 		this.imgUrl="";
 	}
-	public PoneyForm(String name,String color,String superPower, String imgUrl) {
+	public PoneyFormDTO(String name,String color,String superPower, String imgUrl) {
 		this.color = color;
 		this.superPower = superPower;
 		this.name = name;

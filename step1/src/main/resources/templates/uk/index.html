@@ -21,16 +21,9 @@
 	<div th:replace="uk/fragments/header :: header">
 		<h1> THIS IS A DEFAULT HEADER</h1>
 	</div>
-	
-
-
 	<div class="uk-margin uk-padding">
-
-
-
 		<h1 class="uk-heading-large">Welcome</h1>
 		<h2 th:utext="${message}">..!..</h2>
-
 		<article class="uk-comment">
 			<header class="uk-comment-header">
 				<div class="uk-grid-medium uk-flex-middle" uk-grid>
@@ -49,15 +42,10 @@
 						</ul>
 					</div>
 				</div>
-			</header>
 			<div class="uk-comment-body">
 				<p th:utext="${messageLocal}">...</p>
 			</div>
 		</article>
-
-
-
-
 	</div>
 
 	<div class="uk-margin uk-padding">
@@ -70,7 +58,6 @@
 					alt="">List</a></li>
 		</ul>
 	</div>
-	<a th:href="@{/personList}">Person List</a>
 </body>
 
 </html>

@@ -7,12 +7,6 @@ public class Poney  {
 	private String name;
 	private String imgUrl;
 
-	public String getImgUrl() {
-		return imgUrl;
-	}
-	public void setImgUrl(String imgUrl) {
-		this.imgUrl = imgUrl;
-	}
 	public Poney() {
 		this.color = "";
 		this.superPower = "";
@@ -24,6 +18,13 @@ public class Poney  {
 		this.superPower = superPower;
 		this.name = name;
 		this.imgUrl=imgUrl;
+	}
+	
+	public String getImgUrl() {
+		return imgUrl;
+	}
+	public void setImgUrl(String imgUrl) {
+		this.imgUrl = imgUrl;
 	}
 	public String getColor() {
 		return color;
