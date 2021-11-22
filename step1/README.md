@@ -133,7 +133,7 @@ Durant le tutoriel, deux types de visuels seront présentés. Un visuel simple e
   
 | Simple | UIKit |
 | --- | ----------- |
-| <img src="images/index-v1.png" alt="index simple" width="300"/>  |<img src="images/indexUk-v1.png" alt="index simple uk" width="200"/> |
+| <img src="images/index-v1.png" alt="index simple" width="300"/>  |<img src="images/indexUK-v1.png" alt="index simple uk" width="200"/> |
 
 ### 2.3 Modification du template index.html
 - Dans le répertoire `src/main/resources/static` créer un dossier image.
@@ -323,7 +323,7 @@ Durant le tutoriel, deux types de visuels seront présentés. Un visuel simple e
 
 | Simple | UIKit |
 | --- | ----------- |
-| <img src="images/index-v2.png" alt="index simple" width="300"/>  |<img src="images/indexUk-v2.png" alt="index simple uk" width="300"/> |
+| <img src="images/index-v2.png" alt="index simple" width="300"/>  |<img src="images/indexUK-v2.png" alt="index simple uk" width="300"/> |
 
 ## 3 Affichage de données DAO et Model
 ### 3.1 Création du DAO et Model
