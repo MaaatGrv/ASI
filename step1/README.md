@@ -1,5 +1,7 @@
 **Author**: Jacques Saraydaryan, All rights reserved
-# Step 1: Création d'une application Springboot
+# Step 1: Création d'une application Springboot: Web Dynamique
+Le tutoriel suivant permet de créer un controller HTTP définissant des routes (endpoint) et permettant d'afficher des pages dynamiquement complétées (templating).
+Durant le tutoriel, deux types de visuels seront présentés. Un visuel simple et un visuel utilisant UIKit [https://getuikit.com/](https://getuikit.com/), le contenu des fichiers de ce dernier est disponible dans le répertoire `src/main/resources/templates/uk`.
 
 ## 1 Création de l'application
 - Suivre les étapes de la [Step0](../step0/README.md) et créer un projet SpringBoot avec les propriétés suivantes:
@@ -7,552 +9,690 @@
   - ```ArtefactId```: SPWebAppStep1
   - ```Packaging```: jar
 
-## 2 Création d'un Contexte REST
-
-### 2.1 Création d'un RestController Simple
-
-#### 2.1.1 Création du RestController 
-- Dans ```src/main/java``` ajouter le package ```com.sp```
-- Dans les packages ```com.sp``` ajouter ```SpAppHero.java``` comme suit:
-
-```java
-package com.sp;
-
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-
-@SpringBootApplication
-public class SpAppHero {
-	
-	public static void main(String[] args) {
-		SpringApplication.run(SpAppHero.class,args);
-	}
-}
+- Ajouter la dépendance suivante :
 ```
-- Créer un package ```rest``` dans ```com.sp```
-- dans ```com.sp.rest``` créer le fichier ```TestRestCrt```
-
-```java
-package com.sp.rest;
-
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
-@RestController
-public class TestRestCrt {
-	
-	@RequestMapping("/hello")
-	public String sayHello() {
-		return "Hello Hero !!!";
-	}
-
-}
-```
-- Explications:
-  - ```@RestController``` : Annotation qui informe SpringBoot que la classe courante pourra déclencher des comportements en fonction d'urls appelées par un Web Browser.
-  - ```@RequestMapping("/hello")``` : informe que la fonction ```sayHello``` sera déclenchée lors de l'appel de l'url ```/hello```.
-
-#### 2.1.2 Test du RestController Simple 
-- Lancer votre application
-  - Clic droit sur le fichier ```SpAppHero```, ```Run AS``` -> ```Java Application```.
-- Votre application Springboot démarre. Le résultat suivant devrait apparaître dans la console de votre application:
-
-```
-  .   ____          _            __ _ _
- /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
-( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
- \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
-  '  |____| .__|_| |_|_| |_\__, | / / / /
- =========|_|==============|___/=/_/_/_/
- :: Spring Boot ::        (v2.1.7.RELEASE)
-
-2020-04-21 14:41:34.774  INFO 18404 --- [           main] com.sp.SpAppHero                         : Starting SpAppHero on LAPTOP-GUASGB11 with PID 18404 (D:\Data\cpe_cours\ASI\ASI-1\addDocs\ws\asi1-springboot-tuto\step1\target\classes started by jsaraydaryan in D:\Data\cpe_cours\ASI\ASI-1\addDocs\ws\asi1-springboot-tuto\step1)
-2020-04-21 14:41:34.794  INFO 18404 --- [           main] com.sp.SpAppHero                         : No active profile set, falling back to default ...
+<dependencies>
 ...
-...
-2020-04-21 14:41:47.423  INFO 18404 --- [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port(s): 8080 (http) with context path ''
-2020-04-21 14:41:47.459  INFO 18404 --- [           main] com.sp.SpAppHero
+  <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-thymeleaf</artifactId>
+    </dependency>
+  </dependencies>
 ```
+- Cette dépendance va permettre d'utiliser le moteur de templating (template de page html complété coté server) `Thymeleaf` par Springboot
+- `Thymeleaf` est un moteur de templating java orienté serveur. L'idée principale est d'insérer dans les balises HTML des éléments propres au moteur de template afin que le DOM puisse être modifié dynamiquement.
+- Plus de détails sont disponibles sur le site officiel de `Thymeleaf` [https://www.thymeleaf.org](https://www.thymeleaf.org)
+- Dans le répertoire `src/main/resources` créer les répertoires suivants:
+  - `templates`: contiendra les templates HTML compléter par le server Web
+  - `static`: contiendra les fichiers statiques envoyés directement au web browser (e.g, css, js, img, html static...)
 
-- Tester le RestController avec l'url suivante:
-```
-http://127.0.0.1:8080/hello
-```
-- Vous devez avoir le résultat suivant:
-```
-Hello Hero !!!
-```
-
-
-### 2.2 Création d'un RestController avancé
-
-#### 2.2.1 Création d'une Classe Modèle
-- Créer le package ```com.sp.model```
-- Créer le fichier ```Hero.java ``` dans ```com.sp.model``` comme suit:
-```java
-package com.sp.model;
-
-public class Hero {
-	private int id;
-	private String name;
-	private String superPowerName;
-	private int superPowerValue;
-	private String imgUrl;
-	
-	public Hero() {
-	}
-
-	public Hero(int id,String name, String superPowerName, int superPowerValue, String imgUrl) {
-		super();
-		this.id=id;
-		this.name = name;
-		this.superPowerName = superPowerName;
-		this.superPowerValue = superPowerValue;
-		this.imgUrl = imgUrl;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public String getSuperPowerName() {
-		return superPowerName;
-	}
-
-	public void setSuperPowerName(String superPowerName) {
-		this.superPowerName = superPowerName;
-	}
-
-	public int getSuperPowerValue() {
-		return superPowerValue;
-	}
-
-	public void setSuperPowerValue(int superPowerValue) {
-		this.superPowerValue = superPowerValue;
-	}
-
-	public String getImgUrl() {
-		return imgUrl;
-	}
-
-	public void setImgUrl(String imgUrl) {
-		this.imgUrl = imgUrl;
-	}
-	
-	public int getId() {
-		return id;
-	}
-
-	public void setId(int id) {
-		this.id = id;
-	}
-
-	@Override
-	public String toString() {
-		return "HERO ["+this.id+"]: name:"+this.name+", superPowerName:"+this.superPowerName+", superPowerValue:"+this.superPowerValue+" imgUrl:"+this.imgUrl;
-	}
-}
-
-```
-
-#### 2.2.2 Modification du Rest Controller 
-- Modifier le fichier ```TestRestCrt.java``` comme suit:
-
-```java
-package com.sp.rest;
-
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
-import com.sp.model.Hero;
-
-
-@RestController
-public class TestRestCrt {
-	
-	@RequestMapping("/hello")
-	public String sayHello() {
-		return "Hello Hero !!!";
-	}
-	
-	@RequestMapping(method=RequestMethod.POST,value="/addhero")
-	public void addHero(@RequestBody Hero hero) {
-		System.out.println(hero);
-	}
-	
-	@RequestMapping(method=RequestMethod.GET,value="/msg/{id1}/{id2}")
-	public String getMsg(@PathVariable String id1, @PathVariable String id2) {
-		String msg1=id1;
-		String msg2=id2;
-		return "Composed Message: msg1:"+msg1+"msg2:"+msg2;
-	}
-	
-	@RequestMapping(method=RequestMethod.GET,value="/parameters")
-	public String getInfoParam(@RequestParam String param1,@RequestParam String param2) {
-		return "Parameters: param1:"+param1+"param2:"+param2;
-	}
-}
-
-```
-- Explications:
-    ```java
-    ...
-    @RequestMapping(method=RequestMethod.POST,value="/addhero")
-	public void addHero(@RequestBody Hero hero) {
-		System.out.println(hero);
-	}
-    ...
-    ```
-    - ```method=RequestMethod.POST``` : définit la méthode HTTP autorisée sur cette URL.
-    - ```value="/hero"``` : définit l'URL qui déclenchera la fonction
-    - ```@RequestBody Hero hero ``` : permet de rechercher le contenu du body de la requête HTTP et le convertit en objet java
+## 2 Création d'un premier template Thymeleaf
+### 2.1 Création d'un controller Http
+- Dans le répertoire `src/main/java`, créer le package `com.sp.controller`
+- Dans le package `com.sp.controller`, créer le fichier `RequestCrt.java` comme suit:
+  <details open>
+    <summary><b>RequestCrt.java</b></summary>
 
     ```java
-    ...
-    	@RequestMapping(method=RequestMethod.GET,value="/msg/{id1}/{id2}")
-	public String getMsg(@PathVariable String id1, @PathVariable String id2) {
-		String msg1=id1;
-		String msg2=id2;
-		return "Composed Message: msg1:"+msg1+"msg2:"+msg2;
-	}
-    ...
-    ```
-    - ``` value="/msg/{id1}/{id2}" ``` : définit des variables dans l'URL qui seront définies par l'utilisateur lors de l'envoi de L'URL.
-    - ```@PathVariable String id1, @PathVariable String id2``` : récupère les variables de l'URL et les met à disposition de la fonction.
-    ```java
-    @RequestMapping(method=RequestMethod.GET,value="/parameters")
-	public String getInfoParam(@RequestParam String param1,@RequestParam String param2) {
-		return "Parameters: param1:"+param1+"param2:"+param2;
-	}
-    ```
-    - ```@RequestParam String param1,@RequestParam String param2``` : permet de récupérer les paramètres associés à la requête HTTP et de les rendre disponible à la fonction associée.
+    package com.sp.controller;
 
-#### 2.2.3 Test de l'application Rest Controller 
-- Lancer votre application
-  - clic droit sur le fichier ```SpAppHero```, ```Run AS``` -> ```Java Application```.
-- Tester:  Création d'un Hero:
-  - Création d'un Hero : à l'aide de PostMan envoyer la requête suivante:
-
-<img alt="img PostMan Add Hero" src="./images/PostManAddHero.jpg" width="500">
-  
-  - le résultat suivant doit s'afficher dans la console de l'application
-
-    ```
-    HERO [1]: name:jdoe, superPowerName:PowerFull, superPowerValue:500 imgUrl:http://fairedesgifs.free.fr/da/sh/superman/superman%20(5).gif
-    ```
-- Tester:  Variable dans l'URL:
-  - Appeler l'Url suivante dans un Web Browser:
-    ```
-    http://127.0.0.1:8080/msg/myPath1/myPath2
-    ```
-  - Le résultat obtenu:
-
-<img alt="img PostMan Add Hero" src="./images/ResultPathVariable.jpg" width="500">
-
-- Tester:  Paramètres dans la requête HTTP:
-  - Appeler l'Url suivante dans un Web Browser:
-    ```
-    http://127.0.0.1:8080/parameters?param1=value1&param2=value2
-    ```
-  - Le résultat obtenu:
-  
-<img alt="img PostMan Add Hero" src="./images/ResultParams.jpg" width="500">
-
-## 3 Persistance des données et Services
-- Springboot offre la possibilité de faire de l'injection de dépendance. Ainsi des instances de classe crées par le serveur pourront être utilisées dans d'autres classes
-
-### 3.1 Service Springboot
-- Springboot nous permet de créer des instances uniques de classes (Singleton) qui auront comme responsabilité d'effectuer le traitement métiers de l'application
-- Créer le package ```com.sp.service```
-- Créer le fichier ```HeroService.java``` dans le package ```com.sp.service``` comme suit:
-  ```java
-  package com.sp.service;
-    import org.springframework.stereotype.Service;
-
-    import com.sp.model.Hero;
-
-    @Service
-    public class HeroService {
-        
-        public void addHero(Hero h) {
-            System.out.println(h);
-        }
-        
-        public Hero getHero(int id) {
-            Hero h =new Hero(2, "Flash", "VeryFast", 20, "http://fairedesgifs.free.fr/da/sh/flash/flash-(4).gif");
-            return h;
-        }
-
-    }
-    ```
-
-- Explications:
-    - ```@Service``` : annotation permettant de créer un singleton de la classe courante et permettant l'injection de dépendances dans une autre classe.
-
-
-- Créer le fichier ```HeroRestCrt.java``` dans le package ```com.sp.rest``` comme suit:
-  ```java
-    package com.sp.rest;
-
-    import org.springframework.beans.factory.annotation.Autowired;
-    import org.springframework.web.bind.annotation.PathVariable;
-    import org.springframework.web.bind.annotation.RequestBody;
+    import org.springframework.stereotype.Controller;
+    import org.springframework.ui.Model;
     import org.springframework.web.bind.annotation.RequestMapping;
     import org.springframework.web.bind.annotation.RequestMethod;
-    import org.springframework.web.bind.annotation.RestController;
 
-    import com.sp.model.Hero;
-    import com.sp.service.HeroService;
+    @Controller 
+    public class RequestCrt {
+    
+    	private static String messageLocal="Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.";
 
-    @RestController
-    public class HeroRestCrt {
-        @Autowired
-        HeroService hService;
-        
-        @RequestMapping(method=RequestMethod.POST,value="/hero")
-        public void addHero(@RequestBody Hero hero) {
-            hService.addHero(hero);
-        }
-        
-        @RequestMapping(method=RequestMethod.GET,value="/hero/{id}")
-        public Hero getHero(@PathVariable String id) {
-            Hero h=hService.getHero(Integer.valueOf(id));
-            return h;
-        }
+    	@RequestMapping(value = { "/", "/index" }, method = RequestMethod.GET)
+    	public String index(Model model) {
+    		model.addAttribute("messageLocal", messageLocal);
+    		return "index";
+    	}
+
     }
   ```
-  - Explications:
-    - ```@Autowired``` : annotation permettant d'injecter le service ```HeroService```. Cet object sera utilisé uniquement au moment de son appel (e.g ```hService.addHero(hero);```) 
 
-- Tester votre application:
-  - Lancer votre application
-    - Clic droit sur le fichier ```SpAppHero```, ```Run AS``` -> ```Java Application```.
-- Tester:  add User:
-  - A l'aide de Postman, effectuer la requête suivante:
 
-<img alt="img PostMan Add Hero Rest" src="./images/PostManAddHeroRest.jpg" width="500">
+  </details>
 
-  - le résultat suivant doit s'afficher dans la console de l'application
-
-    ```
-    HERO [1]: name:jdoe, superPowerName:PowerFull, superPowerValue:500 imgUrl:http://fairedesgifs.free.fr/da/sh/superman/superman%20(5).gif
-    ```
- - Tester:  get User:
-
-  - Appeler l'Url suivante dans un Web Browser:
-    ```
-    http://127.0.0.1:8080/hero/15
-    ```
-     - Le résultat obtenu:
   
-<img alt="img PostMan Add Hero" src="./images/ResultGetHero.jpg" width="500">
-
-## 3.2 Persistance de données
-
-### 3.2.1 Entity
-- Afin de permettre de sauvegarder ```Hero``` dans la base de données ```H2```. Modifier le fichier ```Hero.java``` comme suit:
-
-```java
-package com.sp.model;
-
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-
-@Entity
-public class Hero {
-	@Id
-	@GeneratedValue
-	private Integer id;
-	private String name;
-	private String superPowerName;
-	private int superPowerValue;
-	private String imgUrl;
-	
-	public Hero() {
-	}
-
-	public Hero(int id,String name, String superPowerName, int superPowerValue, String imgUrl) {
-		super();
-		this.id=id;
-		this.name = name;
-		this.superPowerName = superPowerName;
-		this.superPowerValue = superPowerValue;
-		this.imgUrl = imgUrl;
-	}
-
-...
-```
-- Explications
-  - ```@Entity``` nous indique que cette classe est une classe persistante. Le service JPA va ainsi créer une table correspondante à cette classe (la table de la BD portera le nom de la classe par default)
-  - ```@Id``` indique à JPA que l'attribut ```private int id``` est la clé primaire de notre table
-  - ```@GeneratedValue``` indique à JPA  que l'attribut ```private int id``` sera auto-généré.
-  
-### 3.2.2 Repository
-- Créer le package ```com.sp.repository```
-- Créer le fichier ```HeroRepository.java``` dans ```com.sp.repository``` comme suit:
-```java
-package com.sp.repository;
-
-import java.util.List;
-import org.springframework.data.repository.CrudRepository;
-import com.sp.model.Hero;
-
-public interface HeroRepository extends CrudRepository<Hero, Integer> {
-
-	public List<Hero> findByName(String name);
-}
-```
 - Explications:
-    ```java
-    ...
-    public interface HeroRepository extends CrudRepository<Hero, Integer> {
-    ...
+
+  ```java
+  ...
+  @Controller 
+  public class RequestCrt {
+  ...
+  ```
+  - `@Controller` : annotation indiquant à Springboot que la classe courante sera un controller http (pourra intercepter les requètes http) et que SpringBoot gérera son cycle de vie. Cette classe sera détectée automatiquement par le scanning auto du classpath.
+  
+  ```java
+  ...
+	@RequestMapping(value = { "/", "/index" }, method = RequestMethod.GET)
+	public String index(Model model) {
+		model.addAttribute("messageLocal", messageLocal);
+		return "index";
+	}
+  ...
+  ```
+  - `@RequestMapping` : annotation indiquant de la fonction courante sera déclenchée lors d'un appel HTTP spécifique. Ici la fonction `index(...)` sera déclenchée d'une requète HTTP: GET URL: "/" ou URL: "/index"
+    - `value = { "/", "/index" }`: URL attendue pour déclencher la fonction
+    - `method = RequestMethod.GET` : Méthode HTTP attendue pour déclencher la fonction
+  - `public String index(Model model) {...}` : Fonction déclenchée lors de l'appel HTTP spécifique. `Model model` contient tous les attributs associés à la requête HTTP, servira également à en ajouter de nouveau si nécessaire (e.g `model.addAttribute("messageLocal", messageLocal);` )
+  - `return "index";` si aucune autre indication est apportée (e.g une autre annotation précisant la nature du retour), Sprinboot cherchera a retourner un fichier `index.html` contenu dans le répertoire `templates`
+
+### 2.2 Création du template index.html
+- Dans le répertoire `src/main/resources/templates` ajouter le fichier `index.html` comme suite:
+  <details open>
+    <summary><b>index.html</b></summary>
+
+    ```html
+    <!DOCTYPE HTML>
+      <html xmlns:th="http://www.thymeleaf.org">
+      <head>
+      <meta charset="UTF-8" />
+      <title>Welcome</title>
+      <link rel="stylesheet" type="text/css" th:href="@{/static/style.css}" />
+
+      </head>
+      <body>
+	        <h1>Welcome</h1>
+          <div>
+		        <p th:utext="${messageLocal}">...</p>
+	        </div>
+      </body>
+    </html>
     ```
-    - Springboot nous permet de créer un DAO (Data Access Object) automatiquement à partir de l'interface présentée ici. Cette interface précise que le futur DAO sera un CRUD (Create Read Update Delete) et portera sur l'objet ```Hero```qui a pour clé un ```Integer```. Springboot va alors se charger de créer un singleton DAO à partir de ce fichier avec les méthodes permettant d'ajouter, de mettre à jour, d'accéder et de supprimer des objets ```Hero```.
+  </details>
+
+- Explications:
+  ```html
+    <html xmlns:th="http://www.thymeleaf.org">
+  ```
+    - ` xmlns:th="..." ` : déclaration d'un DTD (Document Type Definition) permettant d'utiliser des balises et des attributs spécifiques à Thymeleaf dans ce fichier HTML (ces derniers seront utilisés à l'aide du tag `th:`)
+
+  ```html
+    <h2 th:utext="${message}">..!..</h2>
+  ```
+  - `th:utext="..."` : Evalue l'expression qui suit et affecte la valeur de cette évaluation au tag en question. Cette approche est particulièrement utile pour remplacer dynamiquement du text dans les documents. le texte de remplacement peur être définit:
+    -  Dans des fichiers de configuration .properties ou i18n par exemple)
+    -  Dans les attributs Http 
+    - Plus d'information est disponible ici [thymeleaf.org .. using-texts](https://www.thymeleaf.org/doc/tutorials/2.1/usingthymeleaf.html#using-texts)
+  - `${...}` : Thymeleaf propose un ensemble d'expressions ([thymeleaf.org .. standard-expression-syntax](https://www.thymeleaf.org/doc/tutorials/3.0/usingthymeleaf.html#standard-expression-syntax)) référençant des variables ou messages:
+    - `${...}` Variable Expressions
+    - `*{...}` Selection Variable Expressions
+    - `#{...}` Message Expressions
+    - `@{...}` Link URL Expressions
+    - `~{...}` Fragment Expressions
+  - Dans notre cas `${messageLocal}` désigne le contenu d'un attribut HTTP contenu à la clé `messageLocal`
+
+- Compiler et exécuter votre application, Le résultat obtenu lors de l'ouverture d'un web browser à l'adresse `localhost:8080\` doit être le suivant:
+  
+| Simple | UIKit |
+| --- | ----------- |
+| <img src="images/index-v1.png" alt="index simple" width="300"/>  |<img src="images/indexUK-v1.png" alt="index simple uk" width="200"/> |
+
+### 2.3 Modification du template index.html
+- Dans le répertoire `src/main/resources/static` créer un dossier image.
+- Ajouter dans ce dossier 4 images (e.g img1.jpg,img2.jpg,img3.jpg,img4.jpg)
+- Modifier le fichier `index.html` afin d'afficher l'une de ces images comme suit:
+ <details open>
+    <summary><b>index.html</b> </summary>
+  
+  ```html
+      <!DOCTYPE HTML>
+        <html xmlns:th="http://www.thymeleaf.org">
+        <head>
+          <meta charset="UTF-8" />
+          <title>Welcome</title>
+          <link rel="stylesheet" type="text/css" th:href="@{/static/style.css}" />
+        </head>
+        <body>
+      	  <h1>Welcome</h1>
+	        <div>
+	        	<img class="uk-comment-avatar" src="/img/img1.jpg" width="80"
+	        		height="80" alt="">
+	        	<ul>
+	        		<li><a href="#">First Introduction</a></li>
+	        		<li><a href="#">More Info</a></li>
+	        	</ul>
+	        </div>
+	        <div>
+	        <p th:utext="${messageLocal}">...</p>
+	        </div>
+          </body>
+      </html>
+  ```
+  </details>
+
+- Completer votre page en ajoutant un header. Nous allons utiliser les `fragments` de Thymeleaf pour cela.
+  - Dans le répertoire `src/main/resources/templates` créer le répertoire `fragments`
+  - Dans ce répertoire créer le fichier `header.html` comme suit:
+    <details open>
+    <summary><b>header.html</b> </summary>
+  
+    ```html
+    <!DOCTYPE HTML>
+    <html xmlns:th="http://www.thymeleaf.org">
+    <head>
+    <meta charset="UTF-8" />
+    <title>HEADER</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/style.css}" />
+    </head>
+    <body>
+    
+    	<div th:fragment="header">
+    		<h1>This is the Fragment Header</h1>
+    	</div>
+    </body>
+    </html>
+    ```
+    </details>
+
+    - Explications:
+      - `th:fragment="header"` : indication permettant à Thymeleaf à déclarer un code qui pourra être insérer dans une autre page.
+  - Afin d'insérer le Header ajouter les éléments suivants dans le le fichier `index.html`
+    ```html
+        ...
+      	<div th:replace="fragments/header :: header">
+	  	    <h1> THIS IS A DEFAULT HEADER</h1>
+	      </div>
+        ...
+    ```
+    - Explications
+      - ` th:replace="fragments/header :: header"` : cet attribut permet de remplacer le contenu du tab par celui du fragment cible:
+        - `fragments/header` : localisation du fichier qui contient les fragments
+        - `:: header` : nom du fragment au sein du fichier cible (e.g définit par `th:fragment=...` comme vu au dessus)
+      - d'autres actions sur les fragments existent:
+        - `th:insert` : insère le fragment spécifié dans le corps du tag HTML courant.
+        - `th:replace` remplace le tag courant par le fragment spécifié.
+        - `th:include` similaire à `th:insert`,  mais à la place d'insérer le fragment, insère le contenu du fragment.
+    - Des informations détaillées sont disponibles ici ([thymeleaf.org .. template-layout](https://www.thymeleaf.org/doc/tutorials/3.0/usingthymeleaf.html#template-layout))
+
+  - Ajout d'un message provenant d'un fichier de configuration
+    - Le fichier `application.properties` contient la configuration du serveur springboot. Ajouter la ligne suivante dans le fichier `src/main/resources/application.properties` :
+
+    ```
+    ...
+    welcome.message= " This is a welcome message from the configuration file application.properties"
+
+    ```
+  - Modifier le fichier `RequestCrt.java` comme suit pour prendre en compte l'information du fichier de configuration `application.properties`:
+    <details open>
+      <summary><b>RequestCrt.java</b> </summary>
     
     ```java
-    ...
-    public List<Hero> findByName(String name);
-    ...
-    ```
-    - Ici on définit une méthode grace à une convention de nommmage ```findBy<attributeName>```. Springboot va alors créer une méthode associée qui effectuera une requête (e.g sql) permettant de récupérer tous les ```Hero``` qui possèdent le ```name``` égal au ```name``` passé en paramètre.
+      package com.sp.controller;
 
-### 3.2.3 Modification du service
-- Modifier le fichier ```HeroService``` comme suit:
+      import org.springframework.beans.factory.annotation.Autowired;
+      import org.springframework.beans.factory.annotation.Value;
+      import org.springframework.stereotype.Controller;
+      import org.springframework.ui.Model;
+      import org.springframework.web.bind.annotation.ModelAttribute;
+      import org.springframework.web.bind.annotation.RequestMapping;
+      import org.springframework.web.bind.annotation.RequestMethod;
+      
+      @Controller // AND NOT @RestController
+      public class RequestCrt {
+      
+      	@Value("${welcome.message}")
+      	private String message;
+      
+      	private static String messageLocal="Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.";
+      
+      	@RequestMapping(value = { "/", "/index" }, method = RequestMethod.GET)
+      	public String index(Model model) {
+        
+      		model.addAttribute("message", message);
+      		model.addAttribute("messageLocal", messageLocal);
+      
+      		return "index";
+      	}
+      ```
 
-```java
-package com.sp.service;
-
-import java.util.Optional;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import com.sp.model.Hero;
-import com.sp.repository.HeroRepository;
-
-@Service
-public class HeroService {
-	@Autowired
-	HeroRepository hRepository;
-	public void addHero(Hero h) {
-		Hero createdHero=hRepository.save(h);
-		System.out.println(createdHero);
-	}
-	
-	public Hero getHero(int id) {
-		Optional<Hero> hOpt =hRepository.findById(id);
-		if (hOpt.isPresent()) {
-			return hOpt.get();
-		}else {
-			return null;
-		}
-	}
-
-}
-```
-- Explications:
-    ```java
-    ...
-    @Autowired
-	HeroRepository hRepository;
-    ...
-    ```
-    - Permet d'injecter l'objet ```HeroRepository``` créé par Springboot
-
-    ```java
-    ...
-    hRepository.save(h);
-	...
-    Optional<Hero> hOpt =hRepository.findById(id);
-    ...
-    ```
-    - ```HeroRepository``` possède des méthodes prédéfinies lui permettant de jouer son rôle de CRUD.
-
-### 3.2.4 Test de l'application
-- Tester votre application:
-  - Lancer votre application
-    - Clic droit sur le fichier ```SpAppHero```, ```Run AS``` -> ```Java Application```.
-
-  - A l'aide de Postman, effecuter la requête suivante:
-
-<img alt="img PostMan Add Hero Rest" src="./images/PostManAddHeroRest.jpg" width="500">
-
-  - Dans un WebBrowser appeler ensuite l'URL suivante avec l'id qui s'affiche dans la console de l'application:
-```
-127.0.0.1:8080/hero/1
-```
- - Le résultat obtenu doit être le suivant:
-
-<img alt="img PostMan Add Hero Rest" src="./images/ResultGetHero2.jpg" width="500">
+    </details>
+    - Explications:
   
+      ```java
+        ...
+        @Value("${welcome.message}")
+        private String message;
+        ...
+      ```
 
-# 4 Changer la configuration par default du serveur Springboot
-- Dans ```src/main/resources``` créer le fichier ```application.properties```
-```yaml
-server.address=127.0.0.1
-server.port=8081
+      - `@Value("${welcome.message}")` : annotation qui permet de récupérer les valeurs du fichier de configuration `application.properties`.
+      ```java
+        ...
+        model.addAttribute("message", message);
+        ...
+      ```
+    - `model.addAttribute(...)` : ajoute un attribut à la requète Http permettant d'être récupéré par la suite par le fichier `index.html`.
+  - Modifier le fichier `index.html` afin qu'il affiche ce nouvel attribut comme suit :
+    <details open>
+      <summary><b>index.html</b> </summary>
 
-## FOR EXTERNAL MYSQL DB
-#spring.jpa.hibernate.ddl-auto = validate
-#spring.jpa.hibernate.ddl-auto=create
-#spring.datasource.url=jdbc:mysql://127.0.0.1:3306/bd
+      ```html
+        <!DOCTYPE HTML>
+        <html xmlns:th="http://www.thymeleaf.org">
+        <head>
+        <meta charset="UTF-8" />
+        <title>Welcome</title>
+        <link rel="stylesheet" type="text/css" th:href="@{/css/style.css}" />
 
-## PostgreSQL
-#spring.datasource.url=jdbc:postgresql://127.0.0.1:5432/bd
-#spring.datasource.username=mylogin
-#spring.datasource.password=mypwd
+        </head>
+        <body>	
+        	<div th:replace="fragments/header :: header">
+        		<h1> THIS IS A DEFAULT HEADER</h1>
+        	</div>
+        	<h1>Welcome</h1>
+        	<h2 th:utext="${message}">..!..</h2>
+        	<div>
+        		<img class="uk-comment-avatar" src="/img/img1.jpg" width="80"
+        			height="80" alt="">
+        		<h4>
+        			<a href="#" th:utext="${message}">...</a>
+        		</h4>
+        		<ul>
+        			<li><a href="#">First Introduction</a></li>
+        			<li><a href="#">More Info</a></li>
+        		</ul>
+        	</div>
+        	<div>
+        		<p th:utext="${messageLocal}">...</p>
+        	</div>
+        	<div>
+        		<ul>
+        			<li><a href="/view"><img src="/img/img2.jpg" width="100"
+        					alt="">Display</a></li>
+        			<li><a href="/addPoney"><img src="/img/img3.jpg" width="100"
+        					alt="">Add</a></li>
+        			<li><a href="/list"><img src="/img/img4.jpg" width="100"
+        					alt="">List</a></li>
+        		</ul>
+        	</div>
+        </body>
+        </html>
+      ```
+    
+    </details>
 
+  - Compiler et exécuter votre application, Le résultat obtenu lors de l'ouverture d'un web browser à l'adresse `localhost:8080\`  doit être le suivant:
 
+| Simple | UIKit |
+| --- | ----------- |
+| <img src="images/index-v2.png" alt="index simple" width="300"/>  |<img src="images/indexUK-v2.png" alt="index simple uk" width="300"/> |
 
-## FOR EMBEDED DB
-spring.jpa.hibernate.ddl-auto=create
+## 3 Affichage de données DAO et Model
+### 3.1 Création du DAO et Model
+- Dans le répertoire `src/main/java`créer le package `com.sp.model`
+- Créer dans ce package la classe `Poney.java` comme suit:
+    <details open>
+      <summary><b>Poney.java</b> </summary>
 
-```
-- Explications:
-  - ```server.address=127.0.0.1``` : permet de rédéfinir l'adresse de notre serveur
-  - ``` server.port=8081 ``` : permet de rédéfinir le port de notre serveur
-  - ```spring.jpa.hibernate.ddl-auto=create``` : permet de définir le comportement de notre application. Ici ```create``` indique à JPA que la base de données sera reconstruite à chaque démarrage de l'application (perte de données à chaque redémarrage). ```validate``` permet d'utiliser une base de données déjà créée.
+    ```java
+    package com.sp.model;
+    public class Poney  {
+    	private String color;
+    	private String superPower;
+    	private String name;
+    	private String imgUrl;
 
-- Usage d'une base de données extérieure
-  - Dans le cas ou vous souhaitez utiliser une base de données extérieure (e.g Postgresql) vous devez
-    - Ajouter la dépendance du connecteur JDBC au pom.xml et commenter les connecteurs non utilisés.
+    	public Poney() {
+    		this.color = "";
+    		this.superPower = "";
+    		this.name = "";
+    		this.imgUrl="";
+    	}
+    	public Poney(String name,String color,String superPower, String imgUrl) {
+    		this.color = color;
+    		this.superPower = superPower;
+    		this.name = name;
+    		this.imgUrl=imgUrl;
+    	}
 
-    ```xml
-    ...
-        <!-- <dependency> -->
-		<!-- <groupId>com.h2database</groupId> -->
-		<!-- <artifactId>h2</artifactId> -->
-		<!-- <scope>runtime</scope> -->
-		<!-- </dependency> -->
+      // GETTER AND SETTER
+    }
+  ```
+    </details>
+  - Une fois le model créé, il est nécessaire de créer un controlleur permettant d'interagir avec ce derner. Dans le package `com.sp.controller`, créer le controlleur `PoneyDao.java` comme suit:
+    <details open>
+      <summary><b>Poney.java</b> </summary>
 
-		<dependency>
-		<groupId>org.postgresql</groupId>
-		<artifactId>postgresql</artifactId>
-		</dependency>
-    ...
+    ```java
+    package com.sp.controller;
+
+    import java.util.ArrayList;
+    import java.util.List;
+    import java.util.Random;
+
+    import org.springframework.stereotype.Service;
+
+    import com.sp.model.Poney;
+
+    @Service
+    public class PoneyDao {
+    	private List<Poney> myPoneyList;
+    	private Random randomGenerator;
+
+    	public PoneyDao() {
+    		myPoneyList=new ArrayList<>();
+    		randomGenerator = new Random();
+    		createPoneyList();
+    	}
+
+    	private void createPoneyList() {
+      
+    		Poney p1=new Poney("John", "pink", "super pink", "http://ekladata.com/9-cPSlYvrenNHMVawFmf_gLx8Jw.gif");
+    		Poney p2=new Poney("Roberto", "blue", "super lazy", "http://ekladata.com/JEVyY9DkwX4vVkakeBfikSyPROA.gif");
+    		Poney p3=new Poney("Anna", "orange", "super music girl", "http://ekladata.com/fMJl--_v-3CmisaynTHju1DMeXE.gif");
+    		Poney p4=new Poney("Angry Joe", "purple", "super angry power", "http://ekladata.com/AmbNNNvv-4YFEMZR8XD8e54WoHc.gif");
+    		Poney p5=new Poney("Ursula", "green", "super cloning power", "http://ekladata.com/CXJhi2YLUbNz6__e0Ct6ZP-XOds.gif");
+
+    		myPoneyList.add(p1);
+    		myPoneyList.add(p2);
+    		myPoneyList.add(p3);
+    		myPoneyList.add(p4);
+    		myPoneyList.add(p5);
+    	}
+    	public List<Poney> getPoneyList() {
+    		return this.myPoneyList;
+    	}
+    	public Poney getPoneyByName(String name){
+    		for (Poney poneyBean : myPoneyList) {
+    			if(poneyBean.getName().equals(name)){
+    				return poneyBean;
+    			}
+    		}
+    		return null;
+    	}
+    	public Poney getRandomPoney(){
+    		int index=randomGenerator.nextInt(this.myPoneyList.size());
+    		return this.myPoneyList.get(index);
+    	}
+
+    	public Poney addPoney(String name, String color, String superPower, String imgUrl) {
+    		Poney p=new Poney(name, color, superPower, imgUrl);
+    		this.myPoneyList.add(p);
+    		return p;
+    	}
+    }
+
     ```
-    - Modifier le fichier ```application.properties``` pour renseigner les propriétés de la base de données cible
+    </details>
 
-    ```yaml
-        server.address=127.0.0.1
-        server.port=8080
+    - Explications
 
-        ## PostgreSQL
-        spring.jpa.hibernate.ddl-auto=create
-        spring.datasource.url=jdbc:postgresql://127.0.0.1:5432/bd
-        spring.datasource.username=mylogin
-        spring.datasource.password=mypwd
+      - Cette classe va permettre de créer une liste de modèle par défaut et des méthodes permettant d'accéder et de manipuler cette liste
+      ```java
+      ...
+       @Service
+      public class PoneyDao {
+        ...
+        }
+      ```
+      - `@Service` : annotation Sprinboot qui permet de créer une instance de la classe qui sera gérée par SPringboot (cycle de vie). Cette classe pourra ainsi être injectée dans d'autre classe.
+  - Modifier le fichier `RequestCrt.java` afin de retourner une vue affichant un poney.
+      <details open>
+        <summary><b>RequestCrt.java</b> </summary>
+
+      ```java
+          ...
+           	@RequestMapping(value = { "/view"}, method = RequestMethod.GET)
+	            public String view(Model model) {
+	            model.addAttribute("myPoney",poneyDao.getRandomPoney() );
+		          return "poneyView";
+	          }
+          ...
+      ```
+      </details>
+
+      - Explications:
+        - `@RequestMapping(value = { "/view"}, method = RequestMethod.GET)`: Annotation qui définit une nouvelle route sur le serveur Web pour un HTTP GET
+        - `model.addAttribute("myPoney",poneyDao.getRandomPoney() );`: ajoute un attribut (object poney choisit aléatoirement) à la requète Http permettant d'être récupéré par la suite par le fichier `poneyView.html`.
+  - Dans le répertoire `src/main/resources/templates`, créer le fichier `poneyView.html` comme suit afin d'afficher le contenu d'un object Poney.
+      <details open>
+        <summary><b>RequestCrt.java</b> </summary>
+
+      ```html
+          <!DOCTYPE HTML>
+          <html xmlns:th="http://www.thymeleaf.org">
+          <head>
+          <meta charset="UTF-8" />
+          <title>Welcome</title>
+          <link rel="stylesheet" type="text/css" th:href="@{/css/style.css}" />
+          </head>
+          <body>
+          	<div th:replace="fragments/header :: header">
+          		<h1> THIS IS A DEFAULT HEADER</h1>
+          	</div>
+          	<div>
+          		<img th:src="${myPoney.imgUrl}" alt="">
+
+          		<h3 th:utext="${myPoney.name}">...</h3>
+
+          		<div th:style="'background-color:'+${myPoney.color}">
+          			<p>
+          				Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed
+          				do eiusmod tempor incididunt.
+          			</p>	
+          		</div>
+
+          		<h5 th:text="'Color:  '+${myPoney.color}">...</h5>
+          		<h5 th:text="'SuperPower:  '+${myPoney.superPower}">...</h5>
+          	</div>
+          </body>
+          </html>
+      ```
+      </details>
+
+      - Explications:
+        - `th:src="${myPoney.imgUrl}"`: Attribut de thymeleaf (`th:src`) permettant de renseigner la source d'une image. `${myPoney.imgUrl}"` récupère l'attribut pour clé `myPoney` et spécifiquement l'attribut `imgUrl` de l'objet contenu à la clé spécifiée.
+        - Afin de récupérer l'attribut visé (e.g `imgUrl`), les getter et setter de l'objet `Poney.java` seront utilisés (ici `getImgUrl()` de la classe `Poney`)
+  - Compiler et exécuter votre application, Le résultat obtenu lors de l'ouverture d'un web browser à l'adresse `localhost:8080\view`  doit être le suivant:
+
+  | Simple | UIKit |
+  | --- | ----------- |
+  | <img src="images/index-view-v1.png" alt="index simple" width="300"/>  |<img src="images/index-view-v2.png " alt="index simple uk" width="300"/> |
+
+
+# 4 Manipulation de Poney
+## 4.1 Création de Poney
+  - Créer une Classe java DTO (Data Transfert Object) `PoneyFormDTO.java` dans `src.main.java.com.sp.model` permettant de recevoir la construction d'un poney.
+    <details open>
+      <summary><b>PoneyFormDTO.java</b> </summary>
+
+    ```java
+    public class PoneyFormDTO  {
+    
+    	private String color;
+    	private String superPower;
+    	private String name;
+    	private String imgUrl;
+
+    	public String getImgUrl() {
+    		return imgUrl;
+    	}
+    	public void setImgUrl(String imgUrl) {
+    		this.imgUrl = imgUrl;
+    	}
+    	public PoneyFormDTO() {
+    		this.color = "";
+    		this.superPower = "";
+    		this.name = "";
+    		this.imgUrl="";
+    	}
+    	public PoneyFormDTO(String name,String color,String superPower, String imgUrl) {
+    		this.color = color;
+    		this.superPower = superPower;
+    		this.name = name;
+    		this.imgUrl=imgUrl;
+    	}
+
+        // GETTER AND SETTER
 
     ```
+    </details>
 
 
+
+  - Modifier le fichier `RequestCrt.java` afin qu'il accèpte une requête d'ajout d'un poney.
+
+    <details open>
+      <summary><b>RequestCrt.java</b> </summary>
+
+    ```java
+        ...
+          @RequestMapping(value = { "/addPoney"}, method = RequestMethod.GET)
+	        public String addponey(Model model) {
+	        	PoneyFormDTO poneyForm = new PoneyFormDTO();
+	        	model.addAttribute("poneyForm", poneyForm);
+	        	return "poneyForm";
+	        }
+
+          @RequestMapping(value = { "/addPoney"}, method = RequestMethod.POST)
+	        public String addponey(Model model, @ModelAttribute("poneyForm") PoneyFormDTO poneyForm) {
+          Poney p=poneyDao.addPoney(poneyForm.getName(),poneyForm.getColor(),poneyForm.getSuperPower(),poneyForm.getImgUrl());
+		      model.addAttribute("myPoney",p );
+		      return "poneyView";
+        ...
+    ```
+    </details>
+
+    - Explications:
+      - `@RequestMapping(value = { "/addPoney"}, method = RequestMethod.GET)` : Annotation qui définit une nouvelle route sur le serveur Web pour un HTTP GET et de retourner la page du formulaire (`return "poneyForm";`).
+      - `@RequestMapping(value = { "/addPoney"}, method = RequestMethod.POST)` : Annotation qui définit une nouvelle route sur le serveur Web pour un HTTP POST
+      - `@ModelAttribute("poneyForm") PoneyFormDTO poneyForm` : annotation qui permet de récupérer le contenu d'un attribut d'une requète HTTP et de le tranformer en object java (ici `PoneyFormDTO`). Cette transformation est réalisée par Springboot en utilisant des outils (e.g jackson) permettant de convertir un formulaire ou un object Json en object Java.
+      - `Poney p=poneyDao.addPoney(...)` : utilise le DAO afin de créer un poney à partir du DTO reçu
+      - `model.addAttribute("myPoney",p );` : ajoute le poney créé au attribute de la requète http
+      - `return "poneyView";` : renvoie l'utilisateur vers la page `poneyView.html`
+
+  - Créer dans le répertoire `src/main/resources/templates` créer le fichier `poneyForm.html` permettant de créer un poney
+
+    <details open>
+      <summary><b>poneyForm.html</b> </summary>
+
+    ```html
+    <!DOCTYPE HTML>
+    <html xmlns:th="http://www.thymeleaf.org">
+    <head>
+    <meta charset="UTF-8" />
+    <title>Welcome</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/style.css}" />
+
+    </head>
+    <body>
+    		<div th:replace="fragments/header :: header">
+    		<h1> THIS IS A DEFAULT HEADER</h1>
+    	</div>
+    	<form th:action="@{/addPoney}"
+             th:object="${poneyForm}" method="POST">
+    		<fieldset >
+    			<legend >Add your Poney ! </legend>
+    			<div >
+    				<label for="form-name">Name</label>
+    				<div >
+    					<input id="form-name" type="text"
+    						placeholder="Poney name..." th:field="*{name}">
+    				</div>
+    			</div>
+    			<div >
+    				<label  for="form-color">Color</label>
+    				<div >
+    					<input  id="form-color" type="text"
+    						placeholder="Poney main color..." th:field="*{color}">
+    				</div>
+    				<label  for="form-superPower">Power</label>
+    				<div >
+    					<input id="form-superPower" type="text"
+    						placeholder="Poney super power..." th:field="*{superPower}">
+    				</div>
+    				<label  for="form-imgUrl">Image URL</label>
+    				<div >
+    					<input  id="form-imgUrl" type="text"
+    						placeholder="Poney super power..." th:field="*{imgUrl}">
+    				</div>
+    			</div>
+    			<div >
+    				<input type="submit"  class="uk-button uk-button-default" value="Create" />
+    			</div>
+
+    		</fieldset>
+    	</form>
+
+    </body>
+
+    </html>
+    ```
+    </details>
+
+  - Compiler et exécuter votre application, Le résultat obtenu lors de l'ouverture d'un web browser à l'adresse `localhost:8080\addPoney`  doit être le suivant:
+
+  | Simple | UIKit |
+  | --- | ----------- |
+  | <img src="images/index-form-v1.png" alt="index simple" width="300"/>  |<img src="images/index-form-v2.png " alt="index simple uk" width="300"/> |
+  | <img src="images/index-formview-v1.png" alt="index simple" width="300"/>  |<img src="images/index-formview-v2.png " alt="index simple uk" width="300"/> |
+
+## 4.1 Affichage d'une liste de Poney
+  - Modifier le ficher `RequestCrt.java` afin qu'il accèpte une nouvelle route et affiche la liste des poneys disponibles.
+
+  <details open>
+      <summary><b>RequestCrt.java</b> </summary>
+
+  ```java
+    ...
+	  @RequestMapping(value = { "/list"}, method = RequestMethod.GET)
+	  public String viewList(Model model) {
+		  model.addAttribute("poneyList",poneyDao.getPoneyList() );
+		  return "poneyViewList";
+	  }
+    ...
+  ```
+  </details>
+
+  - Ajouter le fichier `poneyViewList.html` dans le répertoire `src/main/resources/templates`, afin d'afficher une liste d'objets Poney.
+
+  <details open>
+      <summary><b>RequestCrt.java</b> </summary>
+
+  ```java
+    <!DOCTYPE HTML>
+    <html xmlns:th="http://www.thymeleaf.org">
+    <head>
+    <meta charset="UTF-8" />
+    <title>Welcome</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/style.css}" />
+    </head>
+    <body>
+    	<div th:replace="fragments/header :: header">
+    		<h1> THIS IS A DEFAULT HEADER</h1>
+    	</div>
+    	<ul>
+    		<li th:each="poney : ${poneyList}">
+    			<div>
+    				<img th:src="${poney.imgUrl}" alt="">
+    				<h3 th:utext="${poney.name}">...</h3>
+    				<div th:style="'background-color:'+${poney.color}">
+    					<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed
+    						do eiusmod tempor incididunt.</p>
+    				</div>
+    				<h5 th:text="'Color:  '+${poney.color}">...</h5>
+    				<h5 th:text="'SuperPower:  '+${poney.superPower}">...</h5>
+    			</div>
+    		<li>
+    	</ul>
+    </body>
+    </html>
+  ```
+  </details>
+
+  - Explications:
+      - `th:each="poney : ${poneyList}"` : annotation Thymeleaf permettant de répéter plusieurs fois le contenu du tag Html en question. Ici on récupère la liste contenu à la clé `poneyList` dans la liste des attributs. A chaque répétition un élément de la liste est placé dans la variable `poney` et peut être utilisé à l'intérieur du tag répété (e.g `<h3 th:utext="${poney.name}">...</h3>`)
+
+- Compiler et exécuter votre application, Le résultat obtenu lors de l'ouverture d'un web browser à l'adresse `localhost:8080\list`  doit être le suivant:
+
+  | Simple | UIKit |
+  | --- | ----------- |
+  | <img src="images/index-view-list-v1.png" alt="index simple" width="300"/>  |<img src="images/index-view-list-v2.png " alt="index simple uk" width="300"/> |
