@@ -193,8 +193,8 @@ Durant le tutoriel, deux types de visuels seront présentés. Un visuel simple e
     </details>
 
     - Explications:
-      - `th:fragment="header"` : indication permettant à Thymeleaf à déclarer un code qui pourra être insérer dans une autre page.
-  - Afin d'insérer le Header ajouter les éléments suivants dans le le fichier `index.html`
+      - `th:fragment="header"` : indication permettant à Thymeleaf à déclarer un code qui pourra être inséré dans une autre page.
+  - Afin d'insérer le Header, ajouter les éléments suivants dans le le fichier `index.html`
     ```html
         ...
       	<div th:replace="fragments/header :: header">
@@ -205,7 +205,7 @@ Durant le tutoriel, deux types de visuels seront présentés. Un visuel simple e
     - Explications
       - ` th:replace="fragments/header :: header"` : cet attribut permet de remplacer le contenu du tab par celui du fragment cible:
         - `fragments/header` : localisation du fichier qui contient les fragments
-        - `:: header` : nom du fragment au sein du fichier cible (e.g définit par `th:fragment=...` comme vu au dessus)
+        - `:: header` : nom du fragment au sein du fichier cible (e.g définit par `th:fragment=...` comme vu au-dessus)
       - d'autres actions sur les fragments existent:
         - `th:insert` : insère le fragment spécifié dans le corps du tag HTML courant.
         - `th:replace` remplace le tag courant par le fragment spécifié.
@@ -425,7 +425,7 @@ Durant le tutoriel, deux types de visuels seront présentés. Un visuel simple e
 
     - Explications
 
-      - Cette classe va permettre de créer une liste de modèle par défaut et des méthodes permettant d'accéder et de manipuler cette liste
+      - Cette classe va permettre de créer une liste de modèles par défaut et des méthodes permettant d'accéder et de manipuler cette liste
       ```java
       ...
        @Service
@@ -433,7 +433,7 @@ Durant le tutoriel, deux types de visuels seront présentés. Un visuel simple e
         ...
         }
       ```
-      - `@Service` : annotation Sprinboot qui permet de créer une instance de la classe qui sera gérée par SPringboot (cycle de vie). Cette classe pourra ainsi être injectée dans d'autre classe.
+      - `@Service` : annotation Sprinboot qui permet de créer une instance de la classe qui sera gérée par Springboot (cycle de vie). Cette classe pourra ainsi être injectée dans d'autres classes.
   - Modifier le fichier `RequestCrt.java` afin de retourner une vue affichant un poney.
       <details open>
         <summary><b>RequestCrt.java</b> </summary>
@@ -566,7 +566,7 @@ Durant le tutoriel, deux types de visuels seront présentés. Un visuel simple e
       - `@RequestMapping(value = { "/addPoney"}, method = RequestMethod.POST)` : Annotation qui définit une nouvelle route sur le serveur Web pour un HTTP POST
       - `@ModelAttribute("poneyForm") PoneyFormDTO poneyForm` : annotation qui permet de récupérer le contenu d'un attribut d'une requète HTTP et de le tranformer en object java (ici `PoneyFormDTO`). Cette transformation est réalisée par Springboot en utilisant des outils (e.g jackson) permettant de convertir un formulaire ou un object Json en object Java.
       - `Poney p=poneyDao.addPoney(...)` : utilise le DAO afin de créer un poney à partir du DTO reçu
-      - `model.addAttribute("myPoney",p );` : ajoute le poney créé au attribute de la requète http
+      - `model.addAttribute("myPoney",p );` : ajoute le poney créé aux attributs de la requète http
       - `return "poneyView";` : renvoie l'utilisateur vers la page `poneyView.html`
 
   - Créer dans le répertoire `src/main/resources/templates` créer le fichier `poneyForm.html` permettant de créer un poney
