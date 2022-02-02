@@ -439,6 +439,9 @@ Durant le tutoriel, deux types de visuels seront présentés. Un visuel simple e
         <summary><b>RequestCrt.java</b> </summary>
 
       ```java
+
+	        @Autowired
+	        PoneyDao poneyDao;
           ...
            	@RequestMapping(value = { "/view"}, method = RequestMethod.GET)
 	            public String view(Model model) {
@@ -450,6 +453,7 @@ Durant le tutoriel, deux types de visuels seront présentés. Un visuel simple e
       </details>
 
       - Explications:
+        - `@Autowired` : annotation qui permet l'injection de dépendance à savoir une instance de PoneyDao (couplage faible)
         - `@RequestMapping(value = { "/view"}, method = RequestMethod.GET)`: Annotation qui définit une nouvelle route sur le serveur Web pour un HTTP GET
         - `model.addAttribute("myPoney",poneyDao.getRandomPoney() );`: ajoute un attribut (object poney choisit aléatoirement) à la requète Http permettant d'être récupéré par la suite par le fichier `poneyView.html`.
   - Dans le répertoire `src/main/resources/templates`, créer le fichier `poneyView.html` comme suit afin d'afficher le contenu d'un object Poney.
